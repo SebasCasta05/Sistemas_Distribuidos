@@ -1,16 +1,9 @@
-import '../componentesCss/Footer.css'
-
-function FooterComponents() {
+function Footer() {
   return (
     <footer className="footer">
-      <div className="footer-content">
-        <p>© {new Date().getFullYear()} MyUniversity. Todos los derechos reservados.</p>
-        <nav className="footer-nav">
-          <a href="#">Privacidad</a>
-          <a href="#">Términos</a>
-          <a href="#">Contacto</a>
-        </nav>
-      </div>
+      <p>© 2025 Universidad</p>
     </footer>
-  )
+  );
 }
+
+export default Footer;

@@ -1,18 +1,9 @@
-// HeaderComponents.jsx
-import "./HeaderComponents.css"
-import { Link } from "react-router-dom"
-
-function HeaderComponents() {
+function Header() {
   return (
     <header className="header">
-      <h1>MyUniversity</h1>
-      <nav className="nav-bar">
-        <ul>
-          <li><Link to="/inicio">inicio</Link></li>
-        </ul>
-      </nav>
+      <h1>Bienvenido a la Página</h1>
     </header>
-  )
+  );
 }
 
-export default HeaderComponents
+export default Header;
