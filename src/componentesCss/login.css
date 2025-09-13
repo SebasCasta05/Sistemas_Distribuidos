@@ -1,0 +1,96 @@
+/* Contenedor principal del login */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;   /* ya no centra verticalmente */
+  align-items: center;
+  min-height: 80vh;              /* espacio controlado */
+  background: #f5f6fa;
+  padding: 60px 20px 20px 20px;  /* mueve el formulario un poco hacia abajo */
+}
+
+/* Título */
+.login-title {
+  font-size: 28px;
+  color: #1976d2;
+  margin-bottom: 25px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Formulario */
+.login-form {
+  background: #fff;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 400px;
+  margin-top: 20px;   /* separa un poco el form del título */
+}
+
+/* Campos del formulario */
+.form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.form-group input {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus {
+  border-color: #1976d2;
+  box-shadow: 0 0 4px rgba(25, 118, 210, 0.3);
+}
+
+/* Contenedor de botones */
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;          /* espacio entre botones */
+  margin-top: 15px;
+}
+
+/* Botones */
+.login-btn, .register-btn {
+  flex: 1;             /* mismos tamaños */
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 15px;
+  transition: 0.3s;
+  border: none;
+}
+
+.login-btn {
+  background: #1976d2;
+  color: white;
+}
+
+.login-btn:hover {
+  background: #125a9c;
+}
+
+.register-btn {
+  background: #f9a825;
+  color: white;
+}
+
+.register-btn:hover {
+  background: #f57f17;
+}

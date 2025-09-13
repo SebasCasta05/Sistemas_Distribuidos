@@ -1,4 +1,4 @@
-import Inicio from './interfaces/inicio';
+import Inicio from './interfaces/Login';
 
 function App() {
   return (
