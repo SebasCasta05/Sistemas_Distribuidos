@@ -24,7 +24,7 @@ function Login() {
 
          <div className="button-group">
   <button type="submit" className="login-btn">Entrar</button>
-  <button type="button" className="register-btn">Registrarse</button>
+  <button type="button" className="register-btn">Registrarsee</button>
 </div>
         </form>
       </div>
