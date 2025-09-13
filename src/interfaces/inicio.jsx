@@ -1,4 +1,4 @@
-import './inicio.css'
+import '../componentesCss/inicio.css'
 function Menu(){
     return(
         <div id='menu' >
