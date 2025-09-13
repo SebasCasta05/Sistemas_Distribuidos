@@ -1,78 +1,488 @@
-#menu {
-  padding: 0;
-  background-color: #f5f5f5;
-  min-height: 100vh;
-}
-
-body, #menu {
-  margin: 0;
-  padding: 0;
-  width: 100vw;
-  box-sizing: border-box;
-}
-
+/* ESTILOS DEL HEADER */
 .header {
+  background: #2196f3;
+  color: white;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #2196f3;
-  color: #fff;
   padding: 16px 32px;
-  font-size: 1.2rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  width: 100vw;
+  margin: 0;
+  border-radius: 0;
+}
+
+.header__left {
+  flex: 1;
 }
 
 .header__logo {
+  font-size: 24px;
   font-weight: bold;
-  font-size: 2rem;
 }
 
 .header__nav {
+  flex: 2;
   display: flex;
-  gap: 32px;
+  justify-content: center;
+  gap: 40px;
 }
 
 .header__link {
-  color: #fff;
+  color: white;
   text-decoration: none;
-  font-size: 1.1rem;
-  transition: color 0.2s;
+  font-weight: 500;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
 .header__link:hover {
-  color: #ffd600;
+  background-color: rgba(255, 255, 255, 0.15);
+  text-decoration: none;
 }
 
 .header__right {
+  flex: 1;
   display: flex;
-  align-items: center;
+  justify-content: flex-end;
 }
 
 .header__login {
-  background: #ffb300;
-  color: #fff;
+  background: #f9a825;
   border: none;
-  padding: 8px 24px;
+  color: white;
+  padding: 10px 20px;
   border-radius: 6px;
-  font-size: 1rem;
   cursor: pointer;
   font-weight: bold;
-  transition: background 0.2s;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .header__login:hover {
-  background: #ffa000;
+  background: #f57f17;
+  transform: translateY(-1px);
 }
 
+/* ESTILOS DEL FOOTER */
 .footer {
-  background: #2196f3;
-  color: #fff;
-  padding: 16px 0;
+  background: #1976d2;
+  color: white;
   text-align: center;
-  font-size: 1rem;
-  position: fixed;
-  width: 100%;
-  bottom: 0;
+  padding: 15px;
+  margin-top: 40px;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.2);
+}
+
+/* ESTILOS GENERALES */
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#menu {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ESTILOS PARA EL CONTENIDO PRINCIPAL */
+.main {
+  flex: 1;
+  padding: 20px 40px;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+}
+
+/* Título centrado */
+.centered-title {
+  text-align: center;
+  margin: 20px 0 30px 0;
+}
+
+.centered-title h2 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+  background: linear-gradient(135deg, #3f92db 0%, #2a75c5 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  padding: 10px 0;
+}
+
+/* ESTILOS DE FILTROS */
+.filters-section {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 25px;
+  border: 1px solid #e2e8f0;
+}
+
+.filters-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  position: relative;
+}
+
+.filter-btn {
+  background: #f8f9fa;
+  border: 1px solid #e2e8f0;
+  color: #2d3748;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 12px 18px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  position: relative;
+  font-family: inherit;
+}
+
+.filter-btn:hover {
+  background: #edf2f7;
+  border-color: #cbd5e0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Indicadores de selección en botones */
+.filter-btn.has-selection {
+  background: #e3f2fd !important;
+  border-color: #3f92db !important;
+  color: #3f92db !important;
+}
+
+.selection-count {
+  background: #3f92db;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  margin-left: 5px;
+}
+
+.filter-dropdown {
+  position: absolute;
+  top: 100%;
   left: 0;
-  box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
+  background: white;
+  color: #1f2937;
+  padding: 16px;
+  border-radius: 8px;
+  min-width: 200px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid #e5e7eb;
+  margin-top: 5px;
+  animation: fadeIn 0.2s ease-out;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.wide-dropdown {
+  min-width: 250px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.filter-title {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Estilos para checkboxes personalizados */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 8px 0;
+  transition: background-color 0.2s;
+  border-radius: 4px;
+  padding-left: 5px;
+  font-size: 14px;
+}
+
+.checkbox-label:hover {
+  background-color: #f5f5f5;
+}
+
+.checkbox-container {
+  position: relative;
+  display: inline-block;
+}
+
+.checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.checkmark {
+  position: relative;
+  height: 18px;
+  width: 18px;
+  background-color: #fff;
+  border: 2px solid #ccc;
+  border-radius: 3px;
+  transition: all 0.2s;
+}
+
+.checkbox-container input:checked ~ .checkmark {
+  background-color: #3f92db;
+  border-color: #3f92db;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.checkbox-container .checkmark:after {
+  left: 5px;
+  top: 2px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Chips de selección actual */
+.current-selections {
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+}
+
+.selections-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.selections-header h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.clear-all-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.clear-all-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.selection-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.selection-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s;
+  animation: chipIn 0.3s ease-out;
+}
+
+@keyframes chipIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.city-chip {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: #1e40af;
+  border: 1px solid #93c5fd;
+}
+
+.career-chip {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  color: #0c4a6e;
+  border: 1px solid #7dd3fc;
+}
+
+.filter-chip {
+  background: linear-gradient(135deg, #fae8ff 0%, #f3e8ff 100%);
+  color: #701a75;
+  border: 1px solid #e9d5ff;
+}
+
+.selection-chip button {
+  background: rgba(255, 255, 255, 0.5);
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s;
+}
+
+.city-chip button:hover {
+  background: #3b82f6;
+  color: white;
+}
+
+.career-chip button:hover {
+  background: #0ea5e9;
+  color: white;
+}
+
+.filter-chip button:hover {
+  background: #a855f7;
+  color: white;
+}
+
+/* Botón aplicar */
+.filter-actions {
+  margin-top: 15px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: center;
+}
+
+.apply-btn {
+  background: #3f92db;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.apply-btn:hover {
+  background: #2a75c5;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(63, 146, 219, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header {
+    padding: 12px 20px;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .header__nav {
+    gap: 15px;
+  }
+  
+  .main {
+    padding: 15px 20px;
+  }
+  
+  .filters-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .filter-group {
+    width: 100%;
+  }
+  
+  .filter-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .filter-dropdown {
+    width: 100%;
+    left: 0;
+    right: 0;
+  }
+  
+  .centered-title h2 {
+    font-size: 24px;
+  }
+  
+  .selection-chips {
+    justify-content: center;
+  }
 }
