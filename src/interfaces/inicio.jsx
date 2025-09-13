@@ -1,9 +1,11 @@
 import '../componentesCss/inicio.css'
-function Menu(){
+
+function Inicio(){
     return(
-        <div id='menu' >
-            <h2>esto es un menu</h2>
+        <div id='menu'>
+            <h2>Esto es un menú</h2>
         </div>
     )
 }
-export default Menu;
+
+export default Inicio
