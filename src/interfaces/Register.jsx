@@ -27,7 +27,7 @@ function Register() {
 
           <div className="button-group">
             <button type="submit" className="register-btn">Registrarse</button>
-            <button type="button" className="login-btn">Volver al Login</button>
+            <button type="button" className="login-btn">Volver al Loginn</button>
           </div>
         </form>
       </div>
