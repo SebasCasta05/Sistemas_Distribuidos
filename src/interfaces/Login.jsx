@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "../componentesCss/login.css";
 import Header from './Header.jsx';
 import Footer from './Footer.jsx';
@@ -5,13 +6,10 @@ import Footer from './Footer.jsx';
 function Login() {
   return (
     <>
-      <Header />   {/* ✅ Aquí se muestra el Header */}
-
+      <Header />
       <div className="login-container">
         <h2 className="login-title">Iniciar Sesión</h2>
         <form className="login-form">
-          
-
           <div className="form-group">
             <label htmlFor="email">Correo electrónico</label>
             <input type="email" id="email" name="email" placeholder="ejemplo@email.com" required />
@@ -22,16 +20,15 @@ function Login() {
             <input type="password" id="password" name="password" placeholder="********" required />
           </div>
 
-         <div className="button-group">
-  <button type="submit" className="login-btn">Entrar</button>
-  <button type="button" className="register-btn">Registrarsee</button>
-</div>
+          <div className="button-group">
+            <button type="submit" className="login-btn">Entrar</button>
+            <Link to="/register" className="register-btn">Registrarsee</Link>
+          </div>
         </form>
       </div>
-
-      <Footer />   {/* ✅ Aquí se muestra el Footer */}
+      <Footer />
     </>
   );
 }
 
-export default Login;   
+export default Login;

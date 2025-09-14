@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "../componentesCss/register.css";
 import Header from './Header.jsx';
 import Footer from './Footer.jsx';
@@ -6,7 +7,6 @@ function Register() {
   return (
     <>
       <Header />
-
       <div className="register-container">
         <h2 className="register-title">Crear Cuenta</h2>
         <form className="register-form">
@@ -27,11 +27,10 @@ function Register() {
 
           <div className="button-group">
             <button type="submit" className="register-btn">Registrarse</button>
-            <button type="button" className="login-btn">Volver al Loginn</button>
+            <Link to="/login" className="login-btn">Volver al Login</Link>
           </div>
         </form>
       </div>
-
       <Footer />
     </>
   );

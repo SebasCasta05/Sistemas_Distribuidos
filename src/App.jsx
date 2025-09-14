@@ -1,10 +1,19 @@
-import Inicio from './interfaces/Perfil';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Inicio from "./interfaces/inicio.jsx";
+import Login from "./interfaces/Login.jsx";
+import Register from "./interfaces/Register.jsx";
+import Perfil from "./interfaces/Perfil.jsx";
 
 function App() {
   return (
-    <div>
-      <Inicio />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Inicio />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/perfil" element={<Perfil />} />
+      </Routes>
+    </Router>
   );
 }
 
