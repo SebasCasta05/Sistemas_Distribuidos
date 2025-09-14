@@ -1,4 +1,4 @@
-import Inicio from './interfaces/Register';
+import Inicio from './interfaces/Perfil';
 
 function App() {
   return (
