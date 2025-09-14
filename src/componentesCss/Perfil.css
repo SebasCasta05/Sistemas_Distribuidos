@@ -1,3 +1,4 @@
+/* TU CSS EXISTENTE DE PERFIL SE MANTIENE IGUAL */
 .perfil {
   min-height: 80vh;
   background: #f5f6fa;
@@ -8,7 +9,6 @@
   gap: 30px;
 }
 
-/* Información del usuario */
 .perfil__info {
   background: #fff;
   display: flex;
@@ -46,7 +46,6 @@
   color: #555;
 }
 
-/* Publicaciones */
 .perfil__posts {
   background: #fff;
   padding: 25px 30px;
@@ -68,7 +67,6 @@
   font-style: italic;
 }
 
-/* Botón de editar perfil */
 .perfil__acciones {
   display: flex;
   justify-content: flex-end;
@@ -90,4 +88,136 @@
 
 .perfil__editar-btn:hover {
   background: #f57f17;
+}
+
+/* ===== CÓDIGO PARA ELIMINAR SCROLL Y ARREGLAR FOOTER ===== */
+
+/* Estilos globales */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Estructura principal */
+.app-container {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.main-content {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Header */
+.header {
+  background: #2196f3;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  width: 100%;
+  margin: 0;
+  border-radius: 0;
+}
+
+.header__left .header__logo {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.header__nav {
+  display: flex;
+  gap: 20px;
+}
+
+.header__link {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.header__link:hover {
+  text-decoration: underline;
+}
+
+.header__login {
+  background: #f9a825;
+  border: none;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.header__login:hover {
+  background: #f57f17;
+}
+
+/* Footer */
+.footer {
+  background: #1976d2;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.2);
+  width: 100%;
+}
+
+/* Ocultar barras de scroll */
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+html {
+  scrollbar-width: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+  }
+  
+  .header__nav {
+    gap: 15px;
+  }
+  
+  .perfil {
+    padding: 30px 15px;
+    gap: 20px;
+  }
+  
+  .perfil__info {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .perfil__avatar {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .perfil__posts {
+    padding: 20px;
+  }
+  
+  .perfil__acciones {
+    justify-content: center;
+  }
 }

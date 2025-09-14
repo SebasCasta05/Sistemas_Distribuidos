@@ -1,8 +1,9 @@
+/* TU CSS EXISTENTE SE MANTIENE IGUAL */
 /* Contenedor principal */
 .register-container {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;   /* formulario un poco más arriba */
+  justify-content: flex-start;
   align-items: center;
   min-height: 80vh;
   background: #f5f6fa;
@@ -49,6 +50,7 @@
   outline: none;
   font-size: 14px;
   transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%; /* Agregado para evitar desbordamiento */
 }
 
 .form-group input:focus {
@@ -62,9 +64,10 @@
   justify-content: space-between;
   gap: 10px;
   margin-top: 15px;
+  width: 100%; /* Agregado para evitar desbordamiento */
 }
 
-/* Botonesss */
+/* Botones */
 .register-btn, .login-btn {
   flex: 1;
   padding: 12px;
@@ -74,6 +77,9 @@
   font-size: 15px;
   border: none;
   transition: 0.3s;
+  text-decoration: none; /* Para los enlaces */
+  display: inline-block;
+  text-align: center;
 }
 
 .register-btn {
@@ -92,4 +98,132 @@
 
 .login-btn:hover {
   background: #f57f17;
+}
+
+/* ===== CÓDIGO NUEVO PARA ELIMINAR SCROLL Y ARREGLAR FOOTER ===== */
+
+/* Estilos globales */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  max-width: 100%; /* Evita desbordamiento horizontal */
+}
+
+html, body {
+  overflow-x: hidden; /* Elimina scroll horizontal */
+  width: 100%;
+}
+
+/* Estructura principal de la aplicación */
+.app-container {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.main-content {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Header corregido */
+.header {
+  background: #2196f3;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  width: 100%; /* Cambiado de 100vw a 100% */
+  margin: 0;
+  border-radius: 0;
+}
+
+.header__left .header__logo {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.header__nav {
+  display: flex;
+  gap: 20px;
+}
+
+.header__link {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.header__link:hover {
+  text-decoration: underline;
+}
+
+.header__login {
+  background: #f9a825;
+  border: none;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.header__login:hover {
+  background: #f57f17;
+}
+
+/* Footer corregido */
+.footer {
+  background: #1976d2;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.2);
+  width: 100%;
+  /* NO margin-top: auto para que no se pegue al fondo */
+}
+
+/* Ocultar barras de scroll completamente (opcional) */
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+/* Para Firefox */
+html {
+  scrollbar-width: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .header {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+  }
+  
+  .header__nav {
+    gap: 15px;
+  }
+  
+  .register-container {
+    padding: 40px 15px 15px 15px;
+  }
+  
+  .register-form {
+    padding: 20px 25px;
+    margin: 10px;
+  }
+  
+  .button-group {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .register-btn, .login-btn {
+    width: 100%;
+  }
 }

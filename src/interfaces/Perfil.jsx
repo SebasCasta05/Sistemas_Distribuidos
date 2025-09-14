@@ -1,45 +1,46 @@
-import "../componentesCss/Perfil.css";
-import Header from "./Header";
-import Footer from "./Footer";
+import "../componentesCss/perfil.css"; // o como se llame tu archivo
+import Header from './Header.jsx';
+import Footer from './Footer.jsx';
 
 function Perfil() {
   return (
-    <>
+    <div className="app-container">
       <Header />
-
-      <div className="perfil">
-        {/* Información del usuario */}
-        <section className="perfil__info">
-          <img 
-            src="https://via.placeholder.com/120" 
-            alt="Foto de perfil" 
-            className="perfil__avatar" 
-          />
-          <div className="perfil__datos">
-            <h2 className="perfil__nombre">Juan Pérez</h2>
-            <p className="perfil__detalle">📧 juanperez@email.com</p>
-            <p className="perfil__detalle">🎓 Ingeniería de Sistemas</p>
-            <p className="perfil__detalle">📍 Medellín, Colombia</p>
+      <main className="main-content">
+        <div className="perfil">
+          {/* Información del usuario */}
+          <div className="perfil__info">
+            <img 
+              src="/api/placeholder/120/120" 
+              alt="Avatar del usuario" 
+              className="perfil__avatar"
+            />
+            <div className="perfil__datos">
+              <h2 className="perfil__nombre">Juan Pérez</h2>
+              <p className="perfil__detalle">📧 juan.perez@email.com</p>
+              <p className="perfil__detalle">🎓 Estudiante de Ingeniería</p>
+              <p className="perfil__detalle">📅 Miembro desde: Enero 2024</p>
+            </div>
           </div>
-        </section>
 
-        {/* Publicaciones */}
-        <section className="perfil__posts">
-          <h3 className="perfil__posts-title">Publicaciones</h3>
-          <div className="perfil__posts-contenedor">
-            {/* Aquí en el futuro se listarán las publicaciones */}
-            <p className="perfil__posts-vacio">Aún no has hecho publicaciones.</p>
+          {/* Acciones */}
+          <div className="perfil__acciones">
+            <button className="perfil__editar-btn">
+              ✏️ Editar Perfil
+            </button>
           </div>
-        </section>
 
-        {/* Botón de editar perfil */}
-        <div className="perfil__acciones">
-          <button className="perfil__editar-btn">✏️ Editar Perfil</button>
+          {/* Publicaciones */}
+          <div className="perfil__posts">
+            <h3 className="perfil__posts-title">📝 Mis Publicaciones</h3>
+            <p className="perfil__posts-vacio">
+              Aún no has realizado ninguna publicación.
+            </p>
+          </div>
         </div>
-      </div>
-
+      </main>
       <Footer />
-    </>
+    </div>
   );
 }
 

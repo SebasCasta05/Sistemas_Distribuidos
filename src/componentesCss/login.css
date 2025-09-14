@@ -1,12 +1,78 @@
-/* Contenedor principal del login */
+/* ESTILOS GLOBALES PARA EVITAR BARRAS DE DESPLAZAMIENTO */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow-x: hidden; /* Evita scroll horizontal */
+  width: 100%;
+  height: 100%;
+}
+
+/* HEADER CORREGIDO */
+.header {
+  background: #2196f3;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  width: 100%; /* Cambiado de 100vw a 100% */
+  margin: 0;
+  border-radius: 0;
+  position: relative; /* Agregado para evitar problemas de posicionamiento */
+}
+
+.header__left .header__logo {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.header__nav {
+  display: flex;
+  gap: 20px;
+}
+
+.header__link {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.header__link:hover {
+  text-decoration: underline;
+}
+
+.header__login {
+  background: #f9a825;
+  border: none;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.header__login:hover {
+  background: #f57f17;
+}
+
+/* CONTENEDOR PRINCIPAL DEL LOGIN */
 .login-container {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;   /* ya no centra verticalmente */
+  justify-content: flex-start;
   align-items: center;
-  min-height: 80vh;              /* espacio controlado */
+  min-height: calc(100vh - 140px); /* Ajustado para compensar header y footer */
   background: #f5f6fa;
-  padding: 60px 20px 20px 20px;  /* mueve el formulario un poco hacia abajo */
+  padding: 60px 20px 20px 20px;
+  width: 100%;
+  overflow-x: hidden; /* Evita scroll horizontal en el contenedor */
 }
 
 /* Título */
@@ -26,7 +92,7 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   width: 100%;
   max-width: 400px;
-  margin-top: 20px;   /* separa un poco el form del título */
+  margin-top: 20px;
 }
 
 /* Campos del formulario */
@@ -50,6 +116,7 @@
   outline: none;
   font-size: 14px;
   transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%; /* Asegura que no se desborde */
 }
 
 .form-group input:focus {
@@ -61,13 +128,14 @@
 .button-group {
   display: flex;
   justify-content: space-between;
-  gap: 10px;          /* espacio entre botones */
+  gap: 10px;
   margin-top: 15px;
+  width: 100%; /* Asegura que no se desborde */
 }
 
 /* Botones */
 .login-btn, .register-btn {
-  flex: 1;             /* mismos tamaños */
+  flex: 1;
   padding: 12px;
   border-radius: 8px;
   font-weight: bold;
@@ -75,6 +143,9 @@
   font-size: 15px;
   transition: 0.3s;
   border: none;
+  text-decoration: none; /* Para el enlace */
+  display: inline-block;
+  text-align: center;
 }
 
 .login-btn {
@@ -93,4 +164,78 @@
 
 .register-btn:hover {
   background: #f57f17;
+}
+
+/* FOOTER CORREGIDO */
+.footer {
+  background: #1976d2;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.2);
+  width: 100%; /* Asegura que ocupe todo el ancho disponible */
+  margin-top: auto; /* Empuja el footer hacia abajo */
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+  .header {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+  }
+  
+  .header__nav {
+    gap: 15px;
+  }
+  
+  .login-container {
+    padding: 40px 15px 15px 15px;
+  }
+  
+  .login-form {
+    padding: 20px 25px;
+    margin: 10px;
+  }
+  
+  .button-group {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .login-btn, .register-btn {
+    width: 100%;
+  }
+}
+
+/* ESTRUCTURA PRINCIPAL DE LA APLICACIÓN */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden; /* Previene scroll horizontal */
+}
+
+.main-content {
+  flex: 1; /* Toma todo el espacio disponible entre header y footer */
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Si quieres ocultar completamente las barras de scroll (opcional) */
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+/* Para Firefox */
+html {
+  scrollbar-width: none;
+}
+
+/* Para asegurar que ningún elemento cause desbordamiento */
+* {
+  max-width: 100%;
 }

@@ -1,8 +1,55 @@
+/* ESTRUCTURA PRINCIPAL CORREGIDA */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow-x: hidden;
+  /* QUITAR: min-height: calc(100vh - 120px); */
+}
+
+/* CONTENEDOR DE LOGIN/REGISTER CORREGIDO */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Cambiado de center a flex-start */
+  align-items: center;
+  background: #f5f6fa;
+  padding: 60px 20px 60px 20px; /* Padding equilibrado arriba y abajo */
+  width: 100%;
+  overflow-x: hidden;
+  min-height: calc(100vh - 140px); /* Altura mínima para empujar footer */
+}
+
+/* FOOTER MEJORADO */
 .footer {
   background: #1976d2;
   color: white;
   text-align: center;
   padding: 15px;
-  margin-top: 40px;
   box-shadow: 0 -2px 6px rgba(0,0,0,0.2);
+  width: 100%;
+  flex-shrink: 0; /* Evita que se comprima */
+  margin-top: 0; /* Quitar margin-top: auto */
+}
+
+/* ALTERNATIVA: Si quieres que el footer siempre esté al fondo */
+.footer-sticky {
+  background: #1976d2;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.2);
+  width: 100%;
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
 }
