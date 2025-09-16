@@ -21,6 +21,16 @@ function Register() {
                 required 
               />
             </div>
+            <div className="form-group">
+              <label htmlFor="name">Apellido</label>
+              <input 
+                type="text" 
+                id="apellido" 
+                name="apellido" 
+                placeholder="Ingresa tu apellido" 
+                required 
+              />
+            </div>
 
             <div className="form-group">
               <label htmlFor="email">Correo electrónico</label>
@@ -29,6 +39,17 @@ function Register() {
                 id="email" 
                 name="email" 
                 placeholder="ejemplo@email.com" 
+                required 
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="email">dirección</label>
+              <input 
+                type="text" 
+                id="direccion" 
+                name="direccion" 
+                placeholder="Calle 12 No. 12" 
                 required 
               />
             </div>
