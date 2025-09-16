@@ -33,6 +33,17 @@ function Register() {
             </div>
 
             <div className="form-group">
+              <label htmlFor="name">Telefono</label>
+              <input 
+                type="number" 
+                id="Telefono" 
+                name="Telefono" 
+                placeholder="Ingresa tu Telefono" 
+                required 
+              />
+            </div>
+
+            <div className="form-group">
               <label htmlFor="email">Correo electrónico</label>
               <input 
                 type="email" 
