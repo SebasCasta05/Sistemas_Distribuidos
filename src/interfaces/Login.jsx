@@ -35,10 +35,12 @@ function Login() {
       setMensaje("Inicio de sesión exitoso ✅");
 
       // Guardar usuario en localStorage
-      localStorage.setItem("user", JSON.stringify(data.user));
+      // En Login.jsx, después de login exitoso
+sessionStorage.setItem("user", JSON.stringify(data.user));
+
 
       setTimeout(() => {
-        window.location.href = "/";
+        window.location.href = "/perfil";
       }, 1500);
     } catch (err) {
       setError("Error en la conexión con el servidor");

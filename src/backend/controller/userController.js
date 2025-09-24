@@ -1,7 +1,9 @@
 import pool from "../config/db.js";
 import bcrypt from "bcrypt";
 
+// =====================
 // Registrar usuario
+// =====================
 export const registerUser = async (req, res) => {
   try {
     const { nombre, apellido, email, password, direccion, telefono, tipo_usuario } = req.body;
@@ -19,11 +21,13 @@ export const registerUser = async (req, res) => {
     // Hashear contraseña
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
+    console.log("✅ PasswordHash generado:", passwordHash);
 
     // Insertar usuario en BD
     const newUser = await pool.query(
       `INSERT INTO usuario (nombre, apellido, email, password_hash, direccion, telefono, tipo_usuario) 
-       VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id_usuario, nombre, apellido, email, direccion, telefono, tipo_usuario, fecha_creacion`,
+       VALUES ($1,$2,$3,$4,$5,$6,$7) 
+       RETURNING id_usuario, nombre, apellido, email, direccion, telefono, tipo_usuario, fecha_creacion`,
       [nombre, apellido, email, passwordHash, direccion || null, telefono || null, tipo_usuario || "estudiante"]
     );
 
@@ -32,13 +36,14 @@ export const registerUser = async (req, res) => {
       user: newUser.rows[0]
     });
   } catch (err) {
-    console.error("Error en registerUser:", err);
-    res.status(500).json({ message: "Error en el servidorrr", detalle: err.message,       // 👈 muestra el mensaje exacto
-    stack: err.stack   });
+    console.error("❌ Error en registerUser:", err);
+    res.status(500).json({ message: "Error en el servidor", detalle: err.message });
   }
 };
 
+// =====================
 // Login usuario
+// =====================
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -50,8 +55,14 @@ export const loginUser = async (req, res) => {
     }
 
     const user = result.rows[0];
+    console.log("🔎 Usuario encontrado:", user);
 
     // Verificar contraseña
+    if (!user.password_hash) {
+      console.error("⚠️ El usuario no tiene password_hash en la BD");
+      return res.status(500).json({ message: "Error interno: usuario sin contraseña registrada" });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password_hash);
     if (!isMatch) {
       return res.status(400).json({ message: "Contraseña incorrecta" });
@@ -70,7 +81,35 @@ export const loginUser = async (req, res) => {
       }
     });
   } catch (err) {
-    console.error("Error en loginUser:", err);
+    console.error("❌ Error en loginUser:", err);
     res.status(500).json({ message: "Error en el servidor", error: err.message });
+  }
+};
+
+// =====================
+// Obtener usuario por ID
+// =====================
+export const getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "ID inválido" });
+    }
+
+    const result = await pool.query(
+      `SELECT id_usuario, nombre, apellido, email, direccion, telefono, tipo_usuario, fecha_creacion 
+       FROM usuario WHERE id_usuario = $1`,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("❌ Error en getUserById:", err);
+    res.status(500).json({ message: "Error en el servidor" });
   }
 };
