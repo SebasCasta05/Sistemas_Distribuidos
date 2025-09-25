@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { User, Home, LayoutDashboard, Filter, MapPin, GraduationCap, X, ChevronDown, Search, Star, Users, BookOpen, Award, Globe, Clock } from "lucide-react";
+import { User, Home, LayoutDashboard, Filter, MapPin, GraduationCap, X, ChevronDown, Search, Star, Users, BookOpen, Award, Globe, Clock, TrendingUp, Heart, ExternalLink, Building, DollarSign, Calendar } from "lucide-react";
 import "../componentesCss/inicio.css";
 import Header from './Header.jsx';
 import Footer from './Footer.jsx';
@@ -9,6 +9,8 @@ function Inicio() {
   const [selectedCities, setSelectedCities] = useState([]);
   const [selectedCareers, setSelectedCareers] = useState([]);
   const [selectedFilters, setSelectedFilters] = useState([]);
+  const [showResults, setShowResults] = useState(false);
+  const [searchPerformed, setSearchPerformed] = useState(false);
 
   const cities = ["Barranquilla", "Bogotá", "Medellín", "Cartagena", "Cali"];
   const careers = [
@@ -22,11 +24,71 @@ function Inicio() {
     "Internacionalización", "Oferta de posgrados", "Infraestructura", "Opiniones de estudiantes ⭐"
   ];
 
+  // Datos de universidades de ejemplo
+  const allUniversities = [
+    {
+      id: 1,
+      name: "Universidad Nacional de Colombia",
+      city: "Bogotá",
+      careers: ["Ingeniería de Sistemas", "Medicina", "Derecho"],
+      rating: 4.8,
+      reviews: 2450,
+      ranking: 1,
+      tuition: "Pública",
+      image: "https://via.placeholder.com/400x200/2196F3/white?text=UN",
+      features: ["Ranking / Puntaje", "Semilleros de investigación", "Becas o financiamiento"],
+      description: "La universidad más prestigiosa del país con excelencia académica.",
+      accreditation: "Acreditación de Alta Calidad"
+    },
+    {
+      id: 2,
+      name: "Universidad de los Andes",
+      city: "Bogotá",
+      careers: ["Administración de Empresas", "Ingeniería Civil", "Economía"],
+      rating: 4.7,
+      reviews: 1890,
+      ranking: 2,
+      tuition: "$15M - $20M",
+      image: "https://via.placeholder.com/400x200/9C27B0/white?text=Uniandes",
+      features: ["Internacionalización", "Oferta de posgrados", "Infraestructura"],
+      description: "Reconocida por su calidad académica e investigación de vanguardia.",
+      accreditation: "Acreditación de Alta Calidad"
+    },
+    {
+      id: 3,
+      name: "Universidad Pontificia Bolivariana",
+      city: "Medellín",
+      careers: ["Arquitectura", "Psicología", "Ingeniería de Sistemas"],
+      rating: 4.5,
+      reviews: 1234,
+      ranking: 5,
+      tuition: "$8M - $12M",
+      image: "https://via.placeholder.com/400x200/FF5722/white?text=UPB",
+      features: ["Modalidad de titulación", "Semilleros de investigación"],
+      description: "Universidad católica con tradición en formación integral.",
+      accreditation: "Acreditación de Alta Calidad"
+    },
+    {
+      id: 4,
+      name: "Universidad del Norte",
+      city: "Barranquilla",
+      careers: ["Medicina", "Contaduría Pública", "Administración de Empresas"],
+      rating: 4.6,
+      reviews: 987,
+      ranking: 8,
+      tuition: "$10M - $15M",
+      image: "https://via.placeholder.com/400x200/4CAF50/white?text=UNINORTE",
+      features: ["Internacionalización", "Infraestructura", "Becas o financiamiento"],
+      description: "Líder en la región Caribe con programas innovadores.",
+      accreditation: "Acreditación de Alta Calidad"
+    }
+  ];
+
   const stats = [
-    { icon: Users, label: "Universidades", value: "xxx+" },
-    { icon: BookOpen, label: "Programas", value: "xxxx+" },
-    { icon: Award, label: "Becas", value: "xxx+" },
-    { icon: Globe, label: "Ciudades", value: "5+" }
+    { icon: Users, label: "Universidades", value: "150+" },
+    { icon: BookOpen, label: "Programas", value: "2,000+" },
+    { icon: Award, label: "Becas", value: "500+" },
+    { icon: Globe, label: "Ciudades", value: "32+" }
   ];
 
   const toggleFilter = (filterName) => {
@@ -61,6 +123,8 @@ function Inicio() {
     setSelectedCities([]);
     setSelectedCareers([]);
     setSelectedFilters([]);
+    setShowResults(false);
+    setSearchPerformed(false);
   };
 
   const clearSelection = (type, value) => {
@@ -68,6 +132,23 @@ function Inicio() {
     if (type === "career") setSelectedCareers(selectedCareers.filter(c => c !== value));
     if (type === "filter") setSelectedFilters(selectedFilters.filter(f => f !== value));
   };
+
+  const handleSearch = () => {
+    setShowResults(true);
+    setSearchPerformed(true);
+    setActiveFilter(null);
+  };
+
+  // Filtrar universidades basado en selecciones
+  const filteredUniversities = allUniversities.filter(uni => {
+    const cityMatch = selectedCities.length === 0 || selectedCities.includes(uni.city);
+    const careerMatch = selectedCareers.length === 0 || 
+                       selectedCareers.some(career => uni.careers.includes(career));
+    const filterMatch = selectedFilters.length === 0 || 
+                       selectedFilters.some(filter => uni.features.includes(filter));
+    
+    return cityMatch && careerMatch && filterMatch;
+  });
 
   return (
     <div className="app">
@@ -82,7 +163,7 @@ function Inicio() {
                 Encuentra la <span className="hero__highlight">Universidad</span> Perfecta
               </h1>
               <p className="hero__subtitle">
-                Explora más de 500 universidades, compara programas académicos y toma la mejor decisión para tu futuro profesional.
+                Explora más de 150 universidades, compara programas académicos y toma la mejor decisión para tu futuro profesional.
               </p>
             </div>
             <div className="hero__stats">
@@ -260,7 +341,7 @@ function Inicio() {
               )}
 
               <div className="filters__actions">
-                <button className="apply-btn">
+                <button className="apply-btn" onClick={handleSearch}>
                   <Search size={18} />
                   Buscar Universidades
                 </button>
@@ -268,6 +349,121 @@ function Inicio() {
             </div>
           </div>
         </section>
+
+        {/* Resultados de Universidades */}
+        {showResults && (
+          <section className="results-section">
+            <div className="results__container">
+              <div className="results__header">
+                <div>
+                  <h2 className="results__title">
+                    Resultados de búsqueda
+                  </h2>
+                  <p className="results__subtitle">
+                    Se encontraron {filteredUniversities.length} universidades que coinciden con tus criterios
+                  </p>
+                </div>
+                
+                {filteredUniversities.length > 0 && (
+                  <div className="results__sort">
+                    <span>Ordenar por:</span>
+                    <select className="sort-select">
+                      <option>Ranking</option>
+                      <option>Calificación</option>
+                      <option>Nombre</option>
+                      <option>Ciudad</option>
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              {filteredUniversities.length === 0 ? (
+                <div className="no-results">
+                  <div className="no-results__icon">
+                    <Search size={48} />
+                  </div>
+                  <h3 className="no-results__title">No se encontraron resultados</h3>
+                  <p className="no-results__text">Intenta ajustar tus filtros para obtener más resultados</p>
+                  <button className="no-results__button" onClick={clearAllSelections}>
+                    Limpiar filtros
+                  </button>
+                </div>
+              ) : (
+                <div className="university-grid">
+                  {filteredUniversities.map((university) => (
+                    <div key={university.id} className="university-card">
+                      <div className="university-card__image-container">
+                        <img 
+                          src={university.image} 
+                          alt={university.name}
+                          className="university-card__image"
+                        />
+                        <div className="university-card__ranking">
+                          #{university.ranking}
+                        </div>
+                        <button className="university-card__favorite">
+                          <Heart size={20} />
+                        </button>
+                      </div>
+                      
+                      <div className="university-card__content">
+                        <div className="university-card__info">
+                          <h3 className="university-card__name">
+                            {university.name}
+                          </h3>
+                          <div className="university-card__location">
+                            <MapPin size={16} />
+                            <span>{university.city}</span>
+                          </div>
+                          <div className="university-card__rating">
+                            <div className="rating-stars">
+                              <Star className="star-filled" size={16} />
+                              <span className="rating-value">{university.rating}</span>
+                              <span className="rating-reviews">({university.reviews} opiniones)</span>
+                            </div>
+                          </div>
+                          <p className="university-card__description">{university.description}</p>
+                        </div>
+
+                        <div className="university-card__programs">
+                          <h4 className="programs__title">Programas disponibles:</h4>
+                          <div className="programs__tags">
+                            {university.careers.slice(0, 2).map(career => (
+                              <span key={career} className="program-tag">
+                                {career}
+                              </span>
+                            ))}
+                            {university.careers.length > 2 && (
+                              <span className="program-tag more">
+                                +{university.careers.length - 2} más
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="university-card__footer">
+                          <div className="university-card__tuition">
+                            <DollarSign size={16} />
+                            <span>{university.tuition}</span>
+                          </div>
+                          <button className="university-card__button">
+                            Ver más
+                            <ExternalLink size={16} />
+                          </button>
+                        </div>
+
+                        <div className="university-card__accreditation">
+                          <Award size={14} />
+                          <span>{university.accreditation}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
       </main>
 
       <Footer />
