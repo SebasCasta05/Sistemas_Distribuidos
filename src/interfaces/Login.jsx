@@ -7,11 +7,13 @@ import Footer from "./Footer.jsx";
 function Login() {
   const [error, setError] = useState("");
   const [mensaje, setMensaje] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setMensaje("");
+    setLoading(true);
 
     const formData = {
       email: e.target.email.value,
@@ -29,21 +31,21 @@ function Login() {
 
       if (!res.ok) {
         setError(data.message || "Error al iniciar sesión");
+        setLoading(false);
         return;
       }
 
       setMensaje("Inicio de sesión exitoso ✅");
 
-      // Guardar usuario en localStorage
-      // En Login.jsx, después de login exitoso
-sessionStorage.setItem("user", JSON.stringify(data.user));
-
+      // Guardar usuario en sessionStorage
+      sessionStorage.setItem("user", JSON.stringify(data.user));
 
       setTimeout(() => {
         window.location.href = "/perfil";
       }, 1500);
     } catch (err) {
       setError("Error en la conexión con el servidor");
+      setLoading(false);
     }
   };
 
@@ -56,19 +58,41 @@ sessionStorage.setItem("user", JSON.stringify(data.user));
           <form className="login-form" onSubmit={handleSubmit}>
             <div className="form-group">
               <label htmlFor="email">Correo electrónico</label>
-              <input type="email" id="email" name="email" placeholder="ejemplo@email.com" required />
+              <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                placeholder="ejemplo@email.com" 
+                required 
+                disabled={loading}
+              />
             </div>
             <div className="form-group">
               <label htmlFor="password">Contraseña</label>
-              <input type="password" id="password" name="password" placeholder="********" required />
+              <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                placeholder="********" 
+                required 
+                disabled={loading}
+              />
             </div>
             <div className="button-group">
-              <button type="submit" className="login-btn">Entrar</button>
-              <Link to="/register" className="register-btn">Registrarse</Link>
+              <button 
+                type="submit" 
+                className="login-btn"
+                disabled={loading}
+              >
+                {loading ? "Entrando..." : "Entrar"}
+              </button>
+              <Link to="/register" className="register-btn">
+                Registrarse
+              </Link>
             </div>
+            {error && <div className="error">{error}</div>}
+            {mensaje && <div className="success">{mensaje}</div>}
           </form>
-          {error && <p className="error">{error}</p>}
-          {mensaje && <p className="success">{mensaje}</p>}
         </div>
       </main>
       <Footer />

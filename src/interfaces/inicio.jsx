@@ -85,10 +85,10 @@ function Inicio() {
   ];
 
   const stats = [
-    { icon: Users, label: "Universidades", value: "150+" },
-    { icon: BookOpen, label: "Programas", value: "2,000+" },
-    { icon: Award, label: "Becas", value: "500+" },
-    { icon: Globe, label: "Ciudades", value: "32+" }
+    { icon: Users, label: "Universidades", value: "XXX+" },
+    { icon: BookOpen, label: "Programas", value: "XXX+" },
+    { icon: Award, label: "Becas", value: "XXX+" },
+    { icon: Globe, label: "Ciudades", value: "5+" }
   ];
 
   const toggleFilter = (filterName) => {

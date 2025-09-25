@@ -1,108 +1,4 @@
-/* TU CSS EXISTENTE SE MANTIENE IGUAL */
-/* Contenedor principal */
-.register-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  min-height: 80vh;
-  background: #f5f6fa;
-  padding: 60px 20px 20px 20px;
-}
-
-/* Título */
-.register-title {
-  font-size: 28px;
-  color: #1976d2;
-  margin-bottom: 25px;
-  font-weight: bold;
-  text-align: center;
-}
-
-/* Formulario */
-.register-form {
-  background: #fff;
-  padding: 30px 40px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  width: 100%;
-  max-width: 400px;
-}
-
-/* Campos del formulario */
-.form-group {
-  margin-bottom: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group label {
-  font-size: 14px;
-  color: #333;
-  margin-bottom: 6px;
-  font-weight: 500;
-}
-
-.form-group input {
-  padding: 10px 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  outline: none;
-  font-size: 14px;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  width: 100%; /* Agregado para evitar desbordamiento */
-}
-
-.form-group input:focus {
-  border-color: #1976d2;
-  box-shadow: 0 0 4px rgba(25, 118, 210, 0.3);
-}
-
-/* Contenedor de botones */
-.button-group {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 15px;
-  width: 100%; /* Agregado para evitar desbordamiento */
-}
-
-/* Botones */
-.register-btn, .login-btn {
-  flex: 1;
-  padding: 12px;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 15px;
-  border: none;
-  transition: 0.3s;
-  text-decoration: none; /* Para los enlaces */
-  display: inline-block;
-  text-align: center;
-}
-
-.register-btn {
-  background: #1976d2;
-  color: white;
-}
-
-.register-btn:hover {
-  background: #125a9c;
-}
-
-.login-btn {
-  background: #f9a825;
-  color: white;
-}
-
-.login-btn:hover {
-  background: #f57f17;
-}
-
-/* ===== CÓDIGO NUEVO PARA ELIMINAR SCROLL Y ARREGLAR FOOTER ===== */
-
-/* Estilos globales */
+/* ESTILOS GLOBALES PARA EVITAR BARRAS DE DESPLAZAMIENTO */
 * {
   margin: 0;
   padding: 0;
@@ -113,20 +9,27 @@
 html, body {
   overflow-x: hidden; /* Elimina scroll horizontal */
   width: 100%;
+  height: 100%;
 }
 
-/* Estructura principal de la aplicación */
+/* ESTRUCTURA PRINCIPAL DE LA APLICACIÓN */
 .app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   width: 100%;
   overflow-x: hidden;
 }
 
 .main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   overflow-x: hidden;
 }
 
-/* Header corregido */
+/* HEADER */
 .header {
   background: #2196f3;
   color: white;
@@ -135,9 +38,10 @@ html, body {
   justify-content: space-between;
   padding: 16px 32px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  width: 100%; /* Cambiado de 100vw a 100% */
+  width: 100%;
   margin: 0;
   border-radius: 0;
+  position: relative;
 }
 
 .header__left .header__logo {
@@ -176,7 +80,163 @@ html, body {
   background: #f57f17;
 }
 
-/* Footer corregido */
+/* CONTENEDOR PRINCIPAL DEL REGISTER CON IMAGEN DE FONDO */
+.register-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  min-height: calc(100vh - 140px);
+  background: #f5f6fa;
+  /* Agregando la imagen de fondo */
+  background-image: url('../imagenes/IMAGEN_FONDO.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  padding: 60px 20px 20px 20px;
+  width: 100%;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Overlay semi-transparente para mejorar la legibilidad */
+.register-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(245, 246, 250, 0.4); /* Aquí puedes modificar la opacidad */
+  z-index: 1;
+}
+
+/* Asegurar que el contenido esté por encima del overlay */
+.register-container > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Título */
+.register-title {
+  font-size: 28px;
+  color: #1976d2;
+  margin-bottom: 25px;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+/* Formulario */
+.register-form {
+  background: rgba(255, 255, 255, 0.95); /* Fondo blanco semi-transparente */
+  backdrop-filter: blur(10px); /* Efecto de desenfoque */
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Campos del formulario */
+.form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.form-group input {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.form-group input:focus {
+  border-color: #1976d2;
+  box-shadow: 0 0 4px rgba(25, 118, 210, 0.3);
+  background: white;
+}
+
+/* Contenedor de botones */
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 15px;
+  width: 100%;
+}
+
+/* Botones */
+.register-btn, .login-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 15px;
+  border: none;
+  transition: 0.3s;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.register-btn {
+  background: #1976d2;
+  color: white;
+}
+
+.register-btn:hover {
+  background: #125a9c;
+  box-shadow: 0 4px 8px rgba(25, 118, 210, 0.3);
+}
+
+.login-btn {
+  background: #f9a825;
+  color: white;
+}
+
+.login-btn:hover {
+  background: #f57f17;
+  box-shadow: 0 4px 8px rgba(249, 168, 37, 0.3);
+}
+
+/* Mensajes de error y éxito */
+.error {
+  color: #d32f2f;
+  background: rgba(255, 235, 238, 0.9);
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 15px;
+  text-align: center;
+  border: 1px solid rgba(211, 47, 47, 0.3);
+}
+
+.success {
+  color: #2e7d32;
+  background: rgba(232, 245, 233, 0.9);
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 15px;
+  text-align: center;
+  border: 1px solid rgba(46, 125, 50, 0.3);
+}
+
+/* FOOTER */
 .footer {
   background: #1976d2;
   color: white;
@@ -184,21 +244,20 @@ html, body {
   padding: 15px;
   box-shadow: 0 -2px 6px rgba(0,0,0,0.2);
   width: 100%;
-  /* NO margin-top: auto para que no se pegue al fondo */
+  margin-top: auto;
 }
 
-/* Ocultar barras de scroll completamente (opcional) */
+/* OCULTAR BARRAS DE SCROLL */
 ::-webkit-scrollbar {
   width: 0px;
   background: transparent;
 }
 
-/* Para Firefox */
 html {
   scrollbar-width: none;
 }
 
-/* Responsive design */
+/* RESPONSIVE DESIGN */
 @media (max-width: 768px) {
   .header {
     padding: 12px 16px;
@@ -211,6 +270,7 @@ html {
   
   .register-container {
     padding: 40px 15px 15px 15px;
+    background-attachment: scroll; /* En móviles, mejor scroll que fixed */
   }
   
   .register-form {
