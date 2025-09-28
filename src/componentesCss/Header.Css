@@ -45,3 +45,12 @@
 .login-btn:hover {
   background: #f57f17;
 }
+
+/* 🔹 Botón cerrar sesión */
+.logout-btn {
+  background: #e53935;
+}
+
+.logout-btn:hover {
+  background: #c62828;
+}
