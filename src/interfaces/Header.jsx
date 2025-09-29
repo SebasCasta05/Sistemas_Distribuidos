@@ -5,7 +5,7 @@ function Header() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
-  // Cuando cargue el componente, verificamos si hay usuario en sessionStorage
+  
   useEffect(() => {
     const storedUser = sessionStorage.getItem("user");
     if (storedUser) {
@@ -13,17 +13,12 @@ function Header() {
     }
   }, []);
 
-  const handleLogout = () => {
-    sessionStorage.removeItem("user"); // eliminar sesión
-    setUser(null);
-    navigate("/"); // redirigir a inicio
-  };
-
   return (
     <header className="header">
       <div className="header__left">
         <span className="header__logo">MyUniversity</span>
       </div>
+
       <nav className="header__nav">
         <a 
           href="#" 
@@ -45,10 +40,10 @@ function Header() {
       <div className="header__right">
         {user ? (
           <button 
-            className="header__logout"
-            onClick={handleLogout}
+            className="header__perfil"
+            onClick={() => navigate("/perfil")}
           >
-            <span role="img" aria-label="logout">🚪</span> Cerrar Sesión
+            <span role="img" aria-label="profile">👤</span> Mi Perfil
           </button>
         ) : (
           <button 

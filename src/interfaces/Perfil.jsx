@@ -18,6 +18,10 @@
     const [errorMsg, setErrorMsg] = useState('');
 
     // Cargar datos del usuario al montar
+    const handleLogout = () => {
+  sessionStorage.removeItem('user'); // Limpia los datos del usuario
+  window.location.href = '/login';   // Redirige a la página de login
+};
     useEffect(() => {
       const sessionUser = (() => {
         try {
@@ -32,6 +36,8 @@
         setLoading(false);
         return;
       }
+
+      
 
       const id = sessionUser.id_usuario;
       fetch(`http://localhost:5000/api/users/${id}`)
@@ -251,7 +257,7 @@
                     <Edit3 size={18} />
                     {isEditing ? 'Guardar Cambios' : 'Editar Perfil'}
                   </button>
-                  
+                 <button className="btn-secondary" onClick={handleLogout}>Cerrar Sesión</button>
                 </div>
               </div>
             </div>
