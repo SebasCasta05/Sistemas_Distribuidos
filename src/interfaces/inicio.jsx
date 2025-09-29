@@ -35,7 +35,7 @@ function Inicio() {
       reviews: 2450,
       ranking: 1,
       tuition: "Pública",
-      image: "https://via.placeholder.com/400x200/2196F3/white?text=UN",
+      image: "https://upload.wikimedia.org/wikipedia/commons/7/73/Plaza_Che%2C_Bogot%C3%A1.jpg",
       features: ["Ranking / Puntaje", "Semilleros de investigación", "Becas o financiamiento"],
       description: "La universidad más prestigiosa del país con excelencia académica.",
       accreditation: "Acreditación de Alta Calidad"

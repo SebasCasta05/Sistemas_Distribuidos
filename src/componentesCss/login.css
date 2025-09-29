@@ -61,22 +61,21 @@ html, body {
 .header__login:hover {
   background: #f57f17;
 }
-
 /* CONTENEDOR PRINCIPAL DEL LOGIN CON IMAGEN DE FONDO */
 .login-container {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 140px); /* Ajustado para compensar header y footer */
+  flex: 1; /* Ocupa el espacio disponible */
   background: #f5f6fa;
   /* Agregando la imagen de fondo */
   background-image: url('../imagenes/IMAGEN_FONDO.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  background-attachment: fixed;
-  padding: 60px 20px 20px 20px;
+  background-attachment: scroll;
+  padding: 40px 20px;
   width: 100%;
   overflow-x: hidden; /* Evita scroll horizontal en el contenedor */
   position: relative;
