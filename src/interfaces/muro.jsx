@@ -24,7 +24,7 @@ const Muro = () => {
       city: 'bogota',
       location: 'Barrio Centro',
       phone: '+57 319 447 7410',
-      images: ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop'],
+      images: ['https://i.postimg.cc/25ZhXpmT/Diagramas-de-secuencia.png'],
       timestamp: '2 horas'
     },
     {
@@ -67,7 +67,7 @@ const Muro = () => {
     skills: '',
     workMode: '',
     studies: '',
-    images: []
+    imageUrl: ''
   });
 
   const cities = [
@@ -115,40 +115,13 @@ const Muro = () => {
     }));
   };
 
-  const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
-    
-    Promise.all(files.map(file => {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (event) => resolve(event.target.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-    })).then(imageDataUrls => {
-      setFormData(prev => ({
-        ...prev,
-        images: [...prev.images, ...imageDataUrls]
-      }));
-    }).catch(error => {
-      console.error('Error al cargar imágenes:', error);
-      alert('Error al cargar las imágenes');
-    });
-  };
-
-  const removeImage = (indexToRemove) => {
-    setFormData(prev => ({
-      ...prev,
-      images: prev.images.filter((_, index) => index !== indexToRemove)
-    }));
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     
     const newPost = {
       id: Date.now(),
       ...formData,
+      images: formData.imageUrl ? [formData.imageUrl] : [],
       timestamp: 'Hace unos momentos'
     };
 
@@ -167,7 +140,7 @@ const Muro = () => {
       skills: '',
       workMode: '',
       studies: '',
-      images: []
+      imageUrl: ''
     });
     
     setShowCreateForm(false);
@@ -374,46 +347,20 @@ const Muro = () => {
                     </div>
                   </div>
 
-                  {/* Sección de carga de imágenes */}
-                  <div className="image-upload">
-                    <label className="form-label">Imágenes de la vivienda</label>
-                    
-                    <div 
-                      className="image-drop-zone"
-                      onClick={() => document.getElementById('imageInput').click()}
-                    >
-                      <div className="image-icon">📸</div>
-                      <p>Haz clic para subir imágenes</p>
-                      <input 
-                        type="file" 
-                        id="imageInput" 
-                        multiple 
-                        accept="image/*" 
-                        onChange={handleImageUpload}
-                        className="hidden-input"
-                      />
-                    </div>
-
-                    {/* Previsualización de imágenes cargadas */}
-                    {formData.images.length > 0 && (
-                      <div className="image-preview-grid">
-                        {formData.images.map((image, index) => (
-                          <div key={index} className="image-preview">
-                            <img 
-                              src={image} 
-                              alt={`Preview ${index + 1}`}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => removeImage(index)}
-                              className="image-remove"
-                            >
-                              ×
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                  {/* Sección de URL de imagen */}
+                  <div className="form-group">
+                    <label className="form-label">URL de la imagen</label>
+                    <input 
+                      type="url" 
+                      className="form-input"
+                      name="imageUrl"
+                      value={formData.imageUrl || ''}
+                      onChange={handleInputChange}
+                      placeholder="https://ejemplo.com/imagen.jpg" 
+                    />
+                    <p style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
+                      💡 Recomendación: Sube tu imagen en <a href="https://postimages.org/" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Postimages</a> y copia aquí la URL que dice "Enlace directo para foros" - Ejemplo: https://i.postimg.cc/25ZhXpmT/Diagramas-de-secuencia.png
+                    </p>
                   </div>
                 </>
               ) : (
