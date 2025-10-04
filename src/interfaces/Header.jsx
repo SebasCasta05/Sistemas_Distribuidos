@@ -40,7 +40,7 @@ function Header() {
       <div className="header__right">
         {user ? (
           <button 
-            className="header__perfil"
+            className="header__login"
             onClick={() => navigate("/perfil")}
           >
             <span role="img" aria-label="profile">👤</span> Mi Perfil
