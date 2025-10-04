@@ -278,33 +278,9 @@ function Perfil() {
       <Header />
       <main className="main-content">
         <div className="perfil-container">
-          {/* PORTADA */}
-          <div
-            className="perfil-hero"
-            style={{
-              backgroundImage: coverImage
-                ? `url(${coverImage})`
-                : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-            }}
-          >
-            <div className="cover-overlay"></div>
-            <label className="cover-edit-btn" htmlFor="cover-upload">
-              <Camera size={18} /> Cambiar portada
-              <input id="cover-upload" type="file" accept="image/*" onChange={handleCoverImageChange} style={{ display: 'none' }} />
-            </label>
-          </div>
 
           {/* AVATAR + INFO */}
           <div className="perfil-header">
-            <div className="avatar-container">
-              <div className="perfil-avatar">
-                <img src={profileImage} alt="Avatar del usuario" />
-                <label className="avatar-edit-btn" htmlFor="avatar-upload">
-                  <Camera size={16} />
-                  <input id="avatar-upload" type="file" accept="image/*" onChange={handleProfileImageChange} style={{ display: 'none' }} />
-                </label>
-              </div>
-            </div>
 
             <div className="perfil-info">
               <div className="perfil-main-info">
