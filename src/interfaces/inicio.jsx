@@ -1,8 +1,15 @@
-import { useState } from "react";
-import { User, Home, LayoutDashboard, Filter, MapPin, GraduationCap, X, ChevronDown, Search, Star, Users, BookOpen, Award, Globe, Clock, TrendingUp, Heart, ExternalLink, Building, DollarSign, Calendar } from "lucide-react";
+// =========================
+// File: Inicio.jsx
+// Path suggestion: src/components/Inicio.jsx (o donde tengas el original)
+// =========================
+import React, { useState, useMemo } from "react";
+import { MapPin, GraduationCap, Filter, Search, Users, BookOpen, Award, Globe, DollarSign } from "lucide-react";
 import "../componentesCss/inicio.css";
 import Header from './Header.jsx';
 import Footer from './Footer.jsx';
+import FilterGroup from './FilterGroup.jsx';
+import UniversityCard from './UniversityCard.jsx';
+import NoResults from './NoResults.jsx';
 
 function Inicio() {
   const [activeFilter, setActiveFilter] = useState(null);
@@ -10,7 +17,6 @@ function Inicio() {
   const [selectedCareers, setSelectedCareers] = useState([]);
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [showResults, setShowResults] = useState(false);
-  const [searchPerformed, setSearchPerformed] = useState(false);
 
   const cities = ["Barranquilla", "Bogotá", "Medellín", "Cartagena", "Cali"];
   const careers = [
@@ -24,7 +30,7 @@ function Inicio() {
     "Internacionalización", "Oferta de posgrados", "Infraestructura"
   ];
 
-  // Datos de universidades de ejemplo
+  // Datos mock (igual que antes, aquí puedes conectar a tu API más adelante)
   const allUniversities = [
     {
       id: 1,
@@ -124,7 +130,7 @@ function Inicio() {
     setSelectedCareers([]);
     setSelectedFilters([]);
     setShowResults(false);
-    setSearchPerformed(false);
+    setActiveFilter(null);
   };
 
   const clearSelection = (type, value) => {
@@ -135,20 +141,19 @@ function Inicio() {
 
   const handleSearch = () => {
     setShowResults(true);
-    setSearchPerformed(true);
     setActiveFilter(null);
   };
 
-  // Filtrar universidades basado en selecciones
-  const filteredUniversities = allUniversities.filter(uni => {
-    const cityMatch = selectedCities.length === 0 || selectedCities.includes(uni.city);
-    const careerMatch = selectedCareers.length === 0 || 
-                       selectedCareers.some(career => uni.careers.includes(career));
-    const filterMatch = selectedFilters.length === 0 || 
-                       selectedFilters.some(filter => uni.features.includes(filter));
-    
-    return cityMatch && careerMatch && filterMatch;
-  });
+  const filteredUniversities = useMemo(() => {
+    return allUniversities.filter(uni => {
+      const cityMatch = selectedCities.length === 0 || selectedCities.includes(uni.city);
+      const careerMatch = selectedCareers.length === 0 ||
+                         selectedCareers.some(career => uni.careers.includes(career));
+      const filterMatch = selectedFilters.length === 0 ||
+                         selectedFilters.some(filter => uni.features.includes(filter));
+      return cityMatch && careerMatch && filterMatch;
+    });
+  }, [selectedCities, selectedCareers, selectedFilters, allUniversities]);
 
   return (
     <div className="app">
@@ -192,110 +197,40 @@ function Inicio() {
 
             <div className="filters__content">
               <div className="filter-buttons">
-                {/* Ciudades */}
-                <div className="filter-group">
-                  <button
-                    className={`filter-btn ${selectedCities.length > 0 ? "has-selection" : ""}`}
-                    onClick={() => toggleFilter("cities")}
-                  >
-                    <MapPin size={20} />
-                    <span>Ciudades</span>
-                    {selectedCities.length > 0 && (
-                      <span className="selection-badge">{selectedCities.length}</span>
-                    )}
-                    <ChevronDown size={16} className={`chevron ${activeFilter === "cities" ? "rotated" : ""}`} />
-                  </button>
-                  {activeFilter === "cities" && (
-                    <div className="filter-dropdown">
-                      <div className="dropdown-header">
-                        <h3>Selecciona ciudades</h3>
-                      </div>
-                      <div className="dropdown-content">
-                        {cities.map(city => (
-                          <label key={city} className="checkbox-item">
-                            <input
-                              type="checkbox"
-                              checked={selectedCities.includes(city)}
-                              onChange={() => handleCitySelection(city)}
-                            />
-                            <span className="checkmark"></span>
-                            <span className="checkbox-label">{city}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
+                <FilterGroup
+                  name="cities"
+                  icon={MapPin}
+                  label="Ciudades"
+                  options={cities}
+                  selected={selectedCities}
+                  onOptionToggle={handleCitySelection}
+                  activeFilter={activeFilter}
+                  toggleFilter={toggleFilter}
+                />
 
-                {/* Carreras */}
-                <div className="filter-group">
-                  <button
-                    className={`filter-btn ${selectedCareers.length > 0 ? "has-selection" : ""}`}
-                    onClick={() => toggleFilter("careers")}
-                  >
-                    <GraduationCap size={20} />
-                    <span>Carreras</span>
-                    {selectedCareers.length > 0 && (
-                      <span className="selection-badge">{selectedCareers.length}</span>
-                    )}
-                    <ChevronDown size={16} className={`chevron ${activeFilter === "careers" ? "rotated" : ""}`} />
-                  </button>
-                  {activeFilter === "careers" && (
-                    <div className="filter-dropdown wide">
-                      <div className="dropdown-header">
-                        <h3>Selecciona carreras</h3>
-                      </div>
-                      <div className="dropdown-content">
-                        {careers.map(career => (
-                          <label key={career} className="checkbox-item">
-                            <input
-                              type="checkbox"
-                              checked={selectedCareers.includes(career)}
-                              onChange={() => handleCareerSelection(career)}
-                            />
-                            <span className="checkmark"></span>
-                            <span className="checkbox-label">{career}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
+                <FilterGroup
+                  name="careers"
+                  icon={GraduationCap}
+                  label="Carreras"
+                  options={careers}
+                  selected={selectedCareers}
+                  onOptionToggle={handleCareerSelection}
+                  activeFilter={activeFilter}
+                  toggleFilter={toggleFilter}
+                  wide
+                />
 
-                {/* Más filtros */}
-                <div className="filter-group">
-                  <button
-                    className={`filter-btn ${selectedFilters.length > 0 ? "has-selection" : ""}`}
-                    onClick={() => toggleFilter("more")}
-                  >
-                    <Filter size={20} />
-                    <span>Más Filtros</span>
-                    {selectedFilters.length > 0 && (
-                      <span className="selection-badge">{selectedFilters.length}</span>
-                    )}
-                    <ChevronDown size={16} className={`chevron ${activeFilter === "more" ? "rotated" : ""}`} />
-                  </button>
-                  {activeFilter === "more" && (
-                    <div className="filter-dropdown extra-wide">
-                      <div className="dropdown-header">
-                        <h3>Filtros adicionales</h3>
-                      </div>
-                      <div className="dropdown-content">
-                        {additionalFilters.map(filter => (
-                          <label key={filter} className="checkbox-item">
-                            <input
-                              type="checkbox"
-                              checked={selectedFilters.includes(filter)}
-                              onChange={() => handleFilterSelection(filter)}
-                            />
-                            <span className="checkmark"></span>
-                            <span className="checkbox-label">{filter}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
+                <FilterGroup
+                  name="more"
+                  icon={Filter}
+                  label="Más Filtros"
+                  options={additionalFilters}
+                  selected={selectedFilters}
+                  onOptionToggle={handleFilterSelection}
+                  activeFilter={activeFilter}
+                  toggleFilter={toggleFilter}
+                  extraWide
+                />
               </div>
 
               {/* Selected Filters */}
@@ -304,7 +239,7 @@ function Inicio() {
                   <div className="selected-filters__header">
                     <h4>Filtros aplicados</h4>
                     <button className="clear-all" onClick={clearAllSelections}>
-                      <X size={16} />
+                      <svg viewBox="0 0 24 24" width="16" height="16"><path d="M6 6 L18 18 M6 18 L18 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
                       Limpiar todo
                     </button>
                   </div>
@@ -314,7 +249,7 @@ function Inicio() {
                         <MapPin size={14} />
                         <span>{city}</span>
                         <button onClick={() => clearSelection("city", city)}>
-                          <X size={14} />
+                          <svg viewBox="0 0 24 24" width="14" height="14"><path d="M6 6 L18 18 M6 18 L18 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
                         </button>
                       </div>
                     ))}
@@ -323,7 +258,7 @@ function Inicio() {
                         <GraduationCap size={14} />
                         <span>{career}</span>
                         <button onClick={() => clearSelection("career", career)}>
-                          <X size={14} />
+                          <svg viewBox="0 0 24 24" width="14" height="14"><path d="M6 6 L18 18 M6 18 L18 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
                         </button>
                       </div>
                     ))}
@@ -332,7 +267,7 @@ function Inicio() {
                         <Filter size={14} />
                         <span>{filter}</span>
                         <button onClick={() => clearSelection("filter", filter)}>
-                          <X size={14} />
+                          <svg viewBox="0 0 24 24" width="14" height="14"><path d="M6 6 L18 18 M6 18 L18 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
                         </button>
                       </div>
                     ))}
@@ -356,14 +291,12 @@ function Inicio() {
             <div className="results__container">
               <div className="results__header">
                 <div>
-                  <h2 className="results__title">
-                    Resultados de búsqueda
-                  </h2>
+                  <h2 className="results__title">Resultados de búsqueda</h2>
                   <p className="results__subtitle">
                     Se encontraron {filteredUniversities.length} universidades que coinciden con tus criterios
                   </p>
                 </div>
-                
+
                 {filteredUniversities.length > 0 && (
                   <div className="results__sort">
                     <span>Ordenar por:</span>
@@ -378,86 +311,11 @@ function Inicio() {
               </div>
 
               {filteredUniversities.length === 0 ? (
-                <div className="no-results">
-                  <div className="no-results__icon">
-                    <Search size={48} />
-                  </div>
-                  <h3 className="no-results__title">No se encontraron resultados</h3>
-                  <p className="no-results__text">Intenta ajustar tus filtros para obtener más resultados</p>
-                  <button className="no-results__button" onClick={clearAllSelections}>
-                    Limpiar filtros
-                  </button>
-                </div>
+                <NoResults onClear={clearAllSelections} />
               ) : (
                 <div className="university-grid">
                   {filteredUniversities.map((university) => (
-                    <div key={university.id} className="university-card">
-                      <div className="university-card__image-container">
-                        <img 
-                          src={university.image} 
-                          alt={university.name}
-                          className="university-card__image"
-                        />
-                        <div className="university-card__ranking">
-                          #{university.ranking}
-                        </div>
-                        <button className="university-card__favorite">
-                          <Heart size={20} />
-                        </button>
-                      </div>
-                      
-                      <div className="university-card__content">
-                        <div className="university-card__info">
-                          <h3 className="university-card__name">
-                            {university.name}
-                          </h3>
-                          <div className="university-card__location">
-                            <MapPin size={16} />
-                            <span>{university.city}</span>
-                          </div>
-                          <div className="university-card__rating">
-                            <div className="rating-stars">
-                              <Star className="star-filled" size={16} />
-                              <span className="rating-value">{university.rating}</span>
-                              <span className="rating-reviews">({university.reviews} opiniones)</span>
-                            </div>
-                          </div>
-                          <p className="university-card__description">{university.description}</p>
-                        </div>
-
-                        <div className="university-card__programs">
-                          <h4 className="programs__title">Programas disponibles:</h4>
-                          <div className="programs__tags">
-                            {university.careers.slice(0, 2).map(career => (
-                              <span key={career} className="program-tag">
-                                {career}
-                              </span>
-                            ))}
-                            {university.careers.length > 2 && (
-                              <span className="program-tag more">
-                                +{university.careers.length - 2} más
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="university-card__footer">
-                          <div className="university-card__tuition">
-                            <DollarSign size={16} />
-                            <span>{university.tuition}</span>
-                          </div>
-                          <button className="university-card__button">
-                            Ver más
-                            <ExternalLink size={16} />
-                          </button>
-                        </div>
-
-                        <div className="university-card__accreditation">
-                          <Award size={14} />
-                          <span>{university.accreditation}</span>
-                        </div>
-                      </div>
-                    </div>
+                    <UniversityCard key={university.id} university={university} />
                   ))}
                 </div>
               )}
@@ -472,3 +330,4 @@ function Inicio() {
 }
 
 export default Inicio;
+
