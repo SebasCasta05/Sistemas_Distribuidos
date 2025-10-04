@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../componentesCss/muro.css';
 import Header from "./Header.jsx";
 import Footer from "./Footer.jsx";
+
+const API_URL = "http://localhost:5000/api/publicaciones";
 
 const Muro = () => {
   const [currentCategory, setCurrentCategory] = useState('vivienda');
@@ -9,50 +11,13 @@ const Muro = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
+  const [loading, setLoading] = useState(false);
   const [imageViewer, setImageViewer] = useState({
     isOpen: false,
     images: [],
     currentIndex: 0
   });
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      type: 'vivienda',
-      title: 'Habitación cómoda cerca al campus ',
-      price: '$450.000',
-      description: 'Habitación individual con baño privado, internet incluido. Ambiente tranquilo para estudiar. A 10 minutos caminando de la universidad.',
-      city: 'bogota',
-      location: 'Barrio Centro',
-      phone: '+57 319 447 7410',
-      images: ['https://i.postimg.cc/25ZhXpmT/Diagramas-de-secuencia.png'],
-      timestamp: '2 horas'
-    },
-    {
-      id: 2,
-      type: 'empleo',
-      title: 'Desarrollador Frontend Junior',
-      salary: '$25.000/hora',
-      company: 'TechStart',
-      skills: ['React', 'JavaScript', 'CSS'],
-      workMode: 'hibrido',
-      studies: 'Ingeniería de Sistemas o afín',
-      description: 'Buscamos estudiante de últimos semestres para desarrollo de interfaces web. Experiencia con React y JavaScript.',
-      phone: '+57 300 987 6543',
-      timestamp: '1 día'
-    },
-    {
-      id: 3,
-      type: 'vivienda',
-      title: 'Apartaestudio amoblado',
-      price: '$650.000',
-      description: 'Apartaestudio completamente amoblado, cocina equipada, zona de lavandería. Ideal para estudiantes responsables.',
-      city: 'medellin',
-      location: 'Barrio Universidad',
-      phone: '+57 310 209 6773',
-      images: ['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop'],
-      timestamp: '3 horas'
-    }
-  ]);
+  const [posts, setPosts] = useState([]);
 
   const [formData, setFormData] = useState({
     type: 'vivienda',
@@ -84,7 +49,82 @@ const Muro = () => {
     { value: 'hibrido', label: 'Híbrido' }
   ];
 
-  // Funciones de login
+  // Cargar publicaciones desde la base de datos al montar el componente y al cambiar de categoría
+  useEffect(() => {
+    fetchPosts();
+  }, [currentCategory]);
+
+  // Función para cargar las publicaciones desde la base de datos
+  const fetchPosts = async () => {
+    setLoading(true);
+    try {
+      const endpoint = currentCategory === 'vivienda' ? 'viviendas' : 'empleos';
+      const response = await fetch(`${API_URL}/${endpoint}`);
+      
+      if (!response.ok) {
+        throw new Error('Error al cargar publicaciones');
+      }
+      
+      const data = await response.json();
+      
+      // Transformar datos de la BD al formato del componente
+      const transformedPosts = data.map(item => {
+        if (currentCategory === 'vivienda') {
+          return {
+            id: item.idpublicacionvivienda,
+            type: 'vivienda',
+            title: item.nombre,
+            price: `$${parseFloat(item.precio).toLocaleString('es-CO')}`,
+            description: item.descripcion,
+            city: item.ciudad,
+            location: item.ubicacion,
+            phone: item.telefono,
+            images: item.img ? [item.img] : [],
+            timestamp: formatTimestamp(item.created_at)
+          };
+        } else {
+          return {
+            id: item.idpublicacionempleo,
+            type: 'empleo',
+            title: item.nombre,
+            salary: item.salario,
+            company: item.empresa,
+            skills: item.habilidades_minimas ? item.habilidades_minimas.split(',') : [],
+            workMode: item.modalidad,
+            studies: item.estudios,
+            description: item.descripcion,
+            phone: item.telefono,
+            timestamp: formatTimestamp(item.created_at)
+          };
+        }
+      });
+      
+      setPosts(transformedPosts);
+    } catch (error) {
+      console.error('Error al cargar publicaciones:', error);
+      alert('Error al cargar las publicaciones. Verifica que el servidor esté funcionando.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Función para formatear el timestamp
+  const formatTimestamp = (timestamp) => {
+    const now = new Date();
+    const postDate = new Date(timestamp);
+    const diffMs = now - postDate;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'unos momentos';
+    if (diffMins < 60) return `${diffMins} minutos`;
+    if (diffHours < 24) return `${diffHours} horas`;
+    if (diffDays === 1) return '1 día';
+    return `${diffDays} días`;
+  };
+
+  // Funciones de login (puedes conectarlas a tu API de usuarios después)
   const handleLoginSubmit = (e) => {
     e.preventDefault();
     if (loginData.email && loginData.password) {
@@ -115,40 +155,95 @@ const Muro = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  // Función para enviar el formulario y crear la publicación
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    const newPost = {
-      id: Date.now(),
-      ...formData,
-      images: formData.imageUrl ? [formData.imageUrl] : [],
-      timestamp: 'Hace unos momentos'
-    };
+    setLoading(true);
 
-    setPosts(prev => [newPost, ...prev]);
-    
-    setFormData({
-      type: 'vivienda',
-      title: '',
-      price: '',
-      salary: '',
-      description: '',
-      city: '',
-      location: '',
-      phone: '',
-      company: '',
-      skills: '',
-      workMode: '',
-      studies: '',
-      imageUrl: ''
-    });
-    
-    setShowCreateForm(false);
-    alert('¡Publicación creada exitosamente!');
+    try {
+      const endpoint = formData.type === 'vivienda' ? 'viviendas' : 'empleos';
+      
+      let body;
+      if (formData.type === 'vivienda') {
+        // Convertir precio a número (eliminar $ y comas)
+        const priceNumber = parseFloat(formData.price.replace(/[$.,\s]/g, ''));
+        
+        if (isNaN(priceNumber)) {
+          alert('Por favor ingresa un precio válido (solo números)');
+          setLoading(false);
+          return;
+        }
+        
+        body = {
+          nombre: formData.title,
+          precio: priceNumber,
+          ciudad: formData.city,
+          ubicacion: formData.location,
+          telefono: formData.phone,
+          img: formData.imageUrl || '',
+          descripcion: formData.description
+        };
+      } else {
+        body = {
+          nombre: formData.title,
+          salario: formData.salary,
+          empresa: formData.company,
+          modalidad: formData.workMode,
+          telefono: formData.phone,
+          habilidades_minimas: formData.skills,
+          estudios: formData.studies,
+          descripcion: formData.description
+        };
+      }
+
+      const response = await fetch(`${API_URL}/${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al crear publicación');
+      }
+
+      const newPost = await response.json();
+      alert('¡Publicación creada exitosamente!');
+      
+      // Resetear formulario
+      setFormData({
+        type: 'vivienda',
+        title: '',
+        price: '',
+        salary: '',
+        description: '',
+        city: '',
+        location: '',
+        phone: '',
+        company: '',
+        skills: '',
+        workMode: '',
+        studies: '',
+        imageUrl: ''
+      });
+      
+      setShowCreateForm(false);
+      
+      // Recargar publicaciones para mostrar la nueva
+      await fetchPosts();
+      
+    } catch (error) {
+      console.error('Error:', error);
+      alert(`Error al crear la publicación: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const filterPosts = () => {
-    return posts.filter(post => post.type === currentCategory);
+    return posts;
   };
 
   const handleCategoryChange = (category) => {
@@ -221,6 +316,7 @@ const Muro = () => {
           <button 
             className={`category-button ${currentCategory === 'vivienda' ? 'active' : 'inactive'}`}
             onClick={() => handleCategoryChange('vivienda')}
+            disabled={loading}
           >
             🏠 Viviendas
           </button>
@@ -228,6 +324,7 @@ const Muro = () => {
           <button 
             className="create-button"
             onClick={() => setShowCreateForm(true)}
+            disabled={loading}
           >
             ➕ Crear Publicación
           </button>
@@ -235,6 +332,7 @@ const Muro = () => {
           <button 
             className={`category-button ${currentCategory === 'empleo' ? 'active' : 'inactive'}`}
             onClick={() => handleCategoryChange('empleo')}
+            disabled={loading}
           >
             💼 Empleos
           </button>
@@ -290,16 +388,17 @@ const Muro = () => {
                 <>
                   <div className="form-grid">
                     <div>
-                      <label className="form-label">Precio/mes</label>
+                      <label className="form-label">Precio/mes (solo números)</label>
                       <input 
                         type="text" 
                         className="form-input"
                         name="price"
                         value={formData.price}
                         onChange={handleInputChange}
-                        placeholder="$500.000" 
+                        placeholder="500000" 
                         required 
                       />
+                      <small style={{fontSize: '11px', color: '#666'}}>Sin puntos, comas ni símbolos. Ej: 500000</small>
                     </div>
                     <div>
                       <label className="form-label">Ciudad</label>
@@ -359,7 +458,7 @@ const Muro = () => {
                       placeholder="https://ejemplo.com/imagen.jpg" 
                     />
                     <p style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
-                      💡 Recomendación: Sube tu imagen en <a href="https://postimages.org/" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Postimages</a> y copia aquí la URL que dice "Enlace directo para foros" - Ejemplo: https://i.postimg.cc/25ZhXpmT/Diagramas-de-secuencia.png
+                      💡 Recomendación: Sube tu imagen en <a href="https://postimages.org/" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Postimages</a> y copia aquí la URL "Enlace directo"
                     </p>
                   </div>
                 </>
@@ -469,10 +568,30 @@ const Muro = () => {
               <button 
                 type="submit" 
                 className="submit-button"
+                disabled={loading}
               >
-                Publicar
+                {loading ? 'Publicando...' : 'Publicar'}
               </button>
             </form>
+          </div>
+        )}
+
+        {/* Indicador de carga */}
+        {loading && !showCreateForm && (
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <p style={{ fontSize: '18px', color: '#666' }}>Cargando publicaciones...</p>
+          </div>
+        )}
+
+        {/* Mensaje si no hay publicaciones */}
+        {!loading && posts.length === 0 && (
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <p style={{ fontSize: '18px', color: '#666' }}>
+              No hay publicaciones de {currentCategory === 'vivienda' ? 'viviendas' : 'empleos'} aún.
+            </p>
+            <p style={{ fontSize: '14px', color: '#999', marginTop: '10px' }}>
+              ¡Sé el primero en publicar!
+            </p>
           </div>
         )}
 
@@ -480,13 +599,16 @@ const Muro = () => {
         <div className="posts-grid">
           {filterPosts().map(post => (
             <div key={post.id} className="post-card">
-              {post.type === 'vivienda' && post.images && post.images.length > 0 && (
+              {post.type === 'vivienda' && post.images && post.images.length > 0 && post.images[0] && (
                 <div className="post-image-container">
                   <img 
                     src={post.images[0]} 
                     alt={post.title} 
                     className="post-image"
                     onClick={() => openImageViewer(post.images, 0)}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
                   />
                   {post.images.length > 1 && (
                     <div 
@@ -509,7 +631,7 @@ const Muro = () => {
                   {post.description}
                 </p>
                 
-                {post.type === 'empleo' && post.skills && (
+                {post.type === 'empleo' && post.skills && post.skills.length > 0 && (
                   <div className="post-skills">
                     <strong>Habilidades:</strong>
                     {(typeof post.skills === 'string' ? post.skills.split(',') : post.skills).map((skill, index) => (
@@ -685,7 +807,7 @@ const Muro = () => {
       </main>
     </div>
     <Footer></Footer>
-     </>
+    </>
   );
 };
 

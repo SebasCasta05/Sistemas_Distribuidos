@@ -21,7 +21,7 @@ function Inicio() {
   const additionalFilters = [
     "Ranking / Puntaje", "Semilleros de investigación", "Duración del programa",
     "Horario (Diurno / Nocturno / FDS)", "Modalidad de titulación", "Becas o financiamiento",
-    "Internacionalización", "Oferta de posgrados", "Infraestructura", "Opiniones de estudiantes ⭐"
+    "Internacionalización", "Oferta de posgrados", "Infraestructura"
   ];
 
   // Datos de universidades de ejemplo
