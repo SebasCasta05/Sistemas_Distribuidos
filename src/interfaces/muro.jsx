@@ -9,57 +9,224 @@ import ImageViewer from "./ImageViewer.jsx";
 import LoginModal from "./LoginModal.jsx";
 import "../componentesCss/muro.css";
 
+const API_URL = "http://localhost:5000/api/publicaciones";
+
 const Muro = () => {
-  // 🔹 Estados principales
-  const [currentCategory, setCurrentCategory] = useState("General");
+  // Estados principales
+  const [currentCategory, setCurrentCategory] = useState("vivienda");
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({});
-  const [cities, setCities] = useState([]);
-  const [workModes, setWorkModes] = useState([]);
   const [posts, setPosts] = useState([]);
-  const [imageViewer, setImageViewer] = useState({ isOpen: false, currentIndex: 0 });
+  const [imageViewer, setImageViewer] = useState({ 
+    isOpen: false, 
+    images: [],
+    currentIndex: 0 
+  });
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
 
-  // 🔹 Handlers (ejemplos básicos)
-  const handleCategoryChange = (category) => setCurrentCategory(category);
+  const cities = [
+    { value: 'bogota', label: 'Bogotá' },
+    { value: 'barranquilla', label: 'Barranquilla' },
+    { value: 'medellin', label: 'Medellín' },
+    { value: 'cartagena', label: 'Cartagena' },
+    { value: 'cali', label: 'Cali' }
+  ];
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Publicación creada:", formData);
+  const workModes = [
+    { value: 'presencial', label: 'Presencial' },
+    { value: 'remoto', label: 'Remoto' },
+    { value: 'hibrido', label: 'Híbrido' }
+  ];
+
+  // Cargar publicaciones al montar y al cambiar categoría
+  useEffect(() => {
+    fetchPosts();
+  }, [currentCategory]);
+
+  // Función para cargar publicaciones desde la BD
+  const fetchPosts = async () => {
+    setLoading(true);
+    try {
+      const endpoint = currentCategory === 'vivienda' ? 'viviendas' : 'empleos';
+      const response = await fetch(`${API_URL}/${endpoint}`);
+      
+      if (!response.ok) {
+        throw new Error('Error al cargar publicaciones');
+      }
+      
+      const data = await response.json();
+      
+      // Mantener los datos tal cual vienen del backend (con JOIN)
+      const transformedPosts = data.map(item => ({
+        ...item,
+        id: item.id_publicacionvivienda || item.id_publicacionempleo,
+        tipo_publicacion: currentCategory
+      }));
+      
+      setPosts(transformedPosts);
+    } catch (error) {
+      console.error('Error al cargar publicaciones:', error);
+      alert('Error al cargar las publicaciones. Verifica que el servidor esté funcionando.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  // Función para formatear timestamp
+  const formatTimestamp = (timestamp) => {
+    if (!timestamp) return '';
+    
+    const now = new Date();
+    const postDate = new Date(timestamp);
+    const diffMs = now - postDate;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'hace unos momentos';
+    if (diffMins < 60) return `hace ${diffMins} minutos`;
+    if (diffHours < 24) return `hace ${diffHours} horas`;
+    if (diffDays === 1) return 'hace 1 día';
+    return `hace ${diffDays} días`;
   };
 
-  const handleContact = (post) => {
-    alert(`Contactar con: ${post.nombre}`);
+  // Handler para cambiar categoría
+  const handleCategoryChange = (category) => {
+    setCurrentCategory(category);
   };
 
-  const openImageViewer = (index) => {
-    setImageViewer({ isOpen: true, currentIndex: index });
+  // Handler para enviar formulario y crear publicación
+  const handleSubmit = async (formData) => {
+    setLoading(true);
+
+    try {
+      const endpoint = formData.type === 'vivienda' ? 'viviendas' : 'empleos';
+      
+      let body;
+      if (formData.type === 'vivienda') {
+        // Convertir precio a número
+        const priceNumber = parseFloat(formData.price.replace(/[$.,\s]/g, ''));
+        
+        if (isNaN(priceNumber)) {
+          alert('Por favor ingresa un precio válido (solo números)');
+          setLoading(false);
+          return;
+        }
+        
+        body = {
+          nombre: formData.title,
+          precio: priceNumber,
+          ciudad: formData.city,
+          ubicacion: formData.location,
+          telefono: formData.phone,
+          img: formData.imageUrl || '',
+          descripcion: formData.description
+        };
+      } else {
+        body = {
+          nombre: formData.title,
+          salario: formData.salary,
+          empresa: formData.company,
+          modalidad: formData.workMode,
+          telefono: formData.phone,
+          habilidades_minimas: formData.skills,
+          estudios: formData.studies,
+          descripcion: formData.description
+        };
+      }
+
+      const response = await fetch(`${API_URL}/${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al crear publicación');
+      }
+
+      await response.json();
+      alert('¡Publicación creada exitosamente!');
+      
+      setShowCreateForm(false);
+      
+      // Recargar publicaciones
+      await fetchPosts();
+      
+    } catch (error) {
+      console.error('Error:', error);
+      alert(`Error al crear la publicación: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handler para contactar via WhatsApp
+  const handleContact = (phone) => {
+    const cleanPhone = phone.replace(/[\s\-\(\)\+]/g, '');
+    
+    let formattedPhone = cleanPhone;
+    if (cleanPhone.startsWith('57')) {
+      formattedPhone = cleanPhone;
+    } else if (cleanPhone.startsWith('3')) {
+      formattedPhone = '57' + cleanPhone;
+    } else {
+      formattedPhone = '57' + cleanPhone;
+    }
+    
+    const message = encodeURIComponent('¡Hola! Me interesa tu publicación que vi en MyUniversity. ¿Podrías darme más información?');
+    const whatsappUrl = `https://wa.me/${formattedPhone}?text=${message}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  // Handlers para el visor de imágenes
+  const openImageViewer = (images, startIndex = 0) => {
+    setImageViewer({
+      isOpen: true,
+      images: images,
+      currentIndex: startIndex
+    });
   };
 
   const closeImageViewer = () => {
-    setImageViewer({ ...imageViewer, isOpen: false });
+    setImageViewer({
+      isOpen: false,
+      images: [],
+      currentIndex: 0
+    });
   };
 
   const navigateImage = (direction) => {
-    setImageViewer((prev) => ({
-      ...prev,
-      currentIndex: prev.currentIndex + direction,
-    }));
+    setImageViewer(prev => {
+      const newIndex = direction === 'next' 
+        ? (prev.currentIndex + 1) % prev.images.length
+        : prev.currentIndex === 0 
+          ? prev.images.length - 1 
+          : prev.currentIndex - 1;
+      
+      return { ...prev, currentIndex: newIndex };
+    });
   };
 
+  // Handlers para login
   const handleLoginInputChange = (e) => {
-    setLoginData({ ...loginData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setLoginData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleLoginSubmit = (e) => {
     e.preventDefault();
-    console.log("Login:", loginData);
+    if (loginData.email && loginData.password) {
+      alert('Login exitoso!');
+      setShowLoginModal(false);
+      setLoginData({ email: '', password: '' });
+    } else {
+      alert('Por favor, completa todos los campos');
+    }
   };
 
   return (
@@ -78,15 +245,29 @@ const Muro = () => {
 
           {showCreateForm && (
             <CreatePostForm
-              formData={formData}
-              setFormData={setFormData}
-              handleSubmit={handleSubmit}
-              handleInputChange={handleInputChange}
-              cities={cities}
-              workModes={workModes}
-              setShowCreateForm={setShowCreateForm}
+              onSubmit={handleSubmit}
+              onClose={() => setShowCreateForm(false)}
               loading={loading}
             />
+          )}
+
+          {/* Indicador de carga */}
+          {loading && !showCreateForm && (
+            <div style={{ textAlign: 'center', padding: '40px' }}>
+              <p style={{ fontSize: '18px', color: '#666' }}>Cargando publicaciones...</p>
+            </div>
+          )}
+
+          {/* Mensaje si no hay publicaciones */}
+          {!loading && posts.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '40px' }}>
+              <p style={{ fontSize: '18px', color: '#666' }}>
+                No hay publicaciones de {currentCategory === 'vivienda' ? 'viviendas' : 'empleos'} aún.
+              </p>
+              <p style={{ fontSize: '14px', color: '#999', marginTop: '10px' }}>
+                ¡Sé el primero en publicar!
+              </p>
+            </div>
           )}
 
           <div className="posts-grid">
@@ -98,6 +279,7 @@ const Muro = () => {
                 openImageViewer={openImageViewer}
                 cities={cities}
                 workModes={workModes}
+                formatTimestamp={formatTimestamp}
               />
             ))}
           </div>
