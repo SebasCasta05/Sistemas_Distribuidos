@@ -794,3 +794,67 @@ html, body {
 html {
   scrollbar-width: none;
 }
+
+
+
+
+
+
+.btn-eliminar {
+  background-color: #e63946;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+  margin-top: 10px;
+}
+
+.btn-eliminar:hover {
+  background-color: #b41d29;
+}
+
+.publicacion-card {
+  display: flex;
+  align-items: flex-start;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 15px;
+  margin-bottom: 20px;
+  gap: 15px;
+}
+
+.publicacion-img {
+  width: 160px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.publicacion-info h3 {
+  margin: 0;
+  color: #1d3557;
+}
+
+
+
+.btn-delete {
+  background: #ffdddd;
+  border: none;
+  color: #d11a2a;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.3s;
+}
+
+.btn-delete:hover {
+  background: #ffcccc;
+}
