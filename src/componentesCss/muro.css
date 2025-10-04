@@ -553,3 +553,44 @@
     font-size: 14px;
   }
 }
+
+
+/* CSS DE USUARIO */
+
+/* 🔹 Estilo general del nombre del autor */
+.post-author {
+  font-size: 0.95rem;
+  color: #444;
+  margin-top: 6px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+/* Icono de usuario (puedes usar emoji 👤 o un ícono de fondo) */
+.post-author::before {
+  content: "👤";
+  font-size: 1.1rem;
+  color: #555;
+}
+
+/* 🔹 Si quieres destacar el nombre del autor */
+.post-author strong {
+  color: #1e88e5; /* azul agradable */
+  font-weight: 600;
+}
+
+/* 🔹 Efecto sutil al pasar el mouse */
+.post-author:hover {
+  color: #000;
+  transform: translateX(2px);
+  transition: all 0.2s ease;
+}
+
+/* 🔹 Si quieres un pequeño borde separador arriba del autor */
+.post-author {
+  border-top: 1px solid #eee;
+  padding-top: 8px;
+}

@@ -24,6 +24,7 @@ const Muro = () => {
   });
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const cities = [
     { value: 'bogota', label: 'Bogotá' },
@@ -39,12 +40,24 @@ const Muro = () => {
     { value: 'hibrido', label: 'Híbrido' }
   ];
 
-  // Cargar publicaciones al montar y al cambiar categoría
+  // 🔸 Cargar estado de sesión al iniciar
+    useEffect(() => {
+      const userData = sessionStorage.getItem("user");
+      try {
+        const user = JSON.parse(userData);
+        setIsLoggedIn(!!user && !!user.email); // se asegura que tenga un usuario real
+      } catch {
+        setIsLoggedIn(false);
+      }
+    }, []);
+
+
+  // 🔸 Cargar publicaciones al montar y al cambiar categoría
   useEffect(() => {
     fetchPosts();
   }, [currentCategory]);
 
-  // Función para cargar publicaciones desde la BD
+  // 🔸 Función para cargar publicaciones desde la BD
   const fetchPosts = async () => {
     setLoading(true);
     try {
@@ -56,8 +69,6 @@ const Muro = () => {
       }
       
       const data = await response.json();
-      
-      // Mantener los datos tal cual vienen del backend (con JOIN)
       const transformedPosts = data.map(item => ({
         ...item,
         id: item.id_publicacionvivienda || item.id_publicacionempleo,
@@ -73,7 +84,7 @@ const Muro = () => {
     }
   };
 
-  // Función para formatear timestamp
+  // 🔸 Función para formatear timestamp
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return '';
     
@@ -91,12 +102,22 @@ const Muro = () => {
     return `hace ${diffDays} días`;
   };
 
-  // Handler para cambiar categoría
+  // 🔸 Cambiar categoría
   const handleCategoryChange = (category) => {
     setCurrentCategory(category);
   };
 
-  // Handler para enviar formulario y crear publicación
+  // 🔸 Antes de abrir formulario, verificar login
+  const handleCreateClick = () => {
+    if (!isLoggedIn) {
+      alert("Debes iniciar sesión para poder crear una publicación.");
+    } else {
+      setShowCreateForm(true);
+    }
+  };
+
+
+  // 🔸 Crear publicación
   const handleSubmit = async (formData) => {
     setLoading(true);
 
@@ -105,15 +126,12 @@ const Muro = () => {
       
       let body;
       if (formData.type === 'vivienda') {
-        // Convertir precio a número
         const priceNumber = parseFloat(formData.price.replace(/[$.,\s]/g, ''));
-        
         if (isNaN(priceNumber)) {
           alert('Por favor ingresa un precio válido (solo números)');
           setLoading(false);
           return;
         }
-        
         body = {
           nombre: formData.title,
           precio: priceNumber,
@@ -138,9 +156,7 @@ const Muro = () => {
 
       const response = await fetch(`${API_URL}/${endpoint}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
 
@@ -151,10 +167,7 @@ const Muro = () => {
 
       await response.json();
       alert('¡Publicación creada exitosamente!');
-      
       setShowCreateForm(false);
-      
-      // Recargar publicaciones
       await fetchPosts();
       
     } catch (error) {
@@ -165,41 +178,20 @@ const Muro = () => {
     }
   };
 
-  // Handler para contactar via WhatsApp
+  // 🔸 Contactar por WhatsApp
   const handleContact = (phone) => {
     const cleanPhone = phone.replace(/[\s\-\(\)\+]/g, '');
-    
-    let formattedPhone = cleanPhone;
-    if (cleanPhone.startsWith('57')) {
-      formattedPhone = cleanPhone;
-    } else if (cleanPhone.startsWith('3')) {
-      formattedPhone = '57' + cleanPhone;
-    } else {
-      formattedPhone = '57' + cleanPhone;
-    }
-    
+    let formattedPhone = cleanPhone.startsWith('57') ? cleanPhone : '57' + cleanPhone;
     const message = encodeURIComponent('¡Hola! Me interesa tu publicación que vi en MyUniversity. ¿Podrías darme más información?');
     const whatsappUrl = `https://wa.me/${formattedPhone}?text=${message}`;
     window.open(whatsappUrl, '_blank');
   };
 
-  // Handlers para el visor de imágenes
+  // 🔸 Visor de imágenes
   const openImageViewer = (images, startIndex = 0) => {
-    setImageViewer({
-      isOpen: true,
-      images: images,
-      currentIndex: startIndex
-    });
+    setImageViewer({ isOpen: true, images, currentIndex: startIndex });
   };
-
-  const closeImageViewer = () => {
-    setImageViewer({
-      isOpen: false,
-      images: [],
-      currentIndex: 0
-    });
-  };
-
+  const closeImageViewer = () => setImageViewer({ isOpen: false, images: [], currentIndex: 0 });
   const navigateImage = (direction) => {
     setImageViewer(prev => {
       const newIndex = direction === 'next' 
@@ -207,12 +199,11 @@ const Muro = () => {
         : prev.currentIndex === 0 
           ? prev.images.length - 1 
           : prev.currentIndex - 1;
-      
       return { ...prev, currentIndex: newIndex };
     });
   };
 
-  // Handlers para login
+  // 🔸 Login
   const handleLoginInputChange = (e) => {
     const { name, value } = e.target;
     setLoginData(prev => ({ ...prev, [name]: value }));
@@ -221,12 +212,21 @@ const Muro = () => {
   const handleLoginSubmit = (e) => {
     e.preventDefault();
     if (loginData.email && loginData.password) {
-      alert('Login exitoso!');
+      alert('¡Login exitoso!');
+      setIsLoggedIn(true);
+      sessionStorage.setItem("isLoggedIn", "true"); // ✅ Guardar en sesión
       setShowLoginModal(false);
       setLoginData({ email: '', password: '' });
     } else {
       alert('Por favor, completa todos los campos');
     }
+  };
+
+  // 🔸 Cerrar sesión (opcional)
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    sessionStorage.removeItem("isLoggedIn");
+    alert("Has cerrado sesión.");
   };
 
   return (
@@ -236,10 +236,11 @@ const Muro = () => {
         <main className="muro-main">
           <MuroHeader />
 
+          {/* 🔹 Botones de categoría */}
           <CategoryButtons
             currentCategory={currentCategory}
             handleCategoryChange={handleCategoryChange}
-            setShowCreateForm={setShowCreateForm}
+            setShowCreateForm={handleCreateClick} // Usa la función con validación
             loading={loading}
           />
 
@@ -251,14 +252,12 @@ const Muro = () => {
             />
           )}
 
-          {/* Indicador de carga */}
           {loading && !showCreateForm && (
             <div style={{ textAlign: 'center', padding: '40px' }}>
               <p style={{ fontSize: '18px', color: '#666' }}>Cargando publicaciones...</p>
             </div>
           )}
 
-          {/* Mensaje si no hay publicaciones */}
           {!loading && posts.length === 0 && (
             <div style={{ textAlign: 'center', padding: '40px' }}>
               <p style={{ fontSize: '18px', color: '#666' }}>

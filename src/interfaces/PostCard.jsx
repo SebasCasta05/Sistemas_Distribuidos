@@ -25,6 +25,13 @@ const PostCard = ({ post, handleContact, openImageViewer, cities, workModes }) =
         {/* Título */}
         <h3 className="post-title">{post.titulo}</h3>
 
+        {/* 🔹 Nombre del autor */}
+        {post.autor_nombre && (
+          <p className="post-author">
+            <strong>Publicado por:</strong> {post.autor_nombre} {post.autor_apellido}
+          </p>
+        )}
+
         {/* Descripción */}
         <p className="post-description">{post.descripcion}</p>
 
@@ -34,13 +41,17 @@ const PostCard = ({ post, handleContact, openImageViewer, cities, workModes }) =
             <>
               <span>💰 ${parseFloat(post.precio).toLocaleString('es-CO')}/mes</span>
               <span>📍 {post.ubicacion}</span>
-              <span>🏙️ {cities.find(c => c.value === post.ciudad)?.label || post.ciudad}</span>
+              <span>
+                🏙️ {cities.find(c => c.value === post.ciudad)?.label || post.ciudad}
+              </span>
             </>
           ) : (
             <>
               <span>💰 {post.salario}</span>
               <span>🏢 {post.empresa}</span>
-              <span>💻 {workModes.find(w => w.value === post.modalidad)?.label || post.modalidad}</span>
+              <span>
+                💻 {workModes.find(w => w.value === post.modalidad)?.label || post.modalidad}
+              </span>
               {post.estudios && <span>🎓 {post.estudios}</span>}
             </>
           )}
@@ -73,7 +84,7 @@ const PostCard = ({ post, handleContact, openImageViewer, cities, workModes }) =
   );
 };
 
-// Función helper para formatear tiempo (agrégala fuera del componente)
+// Función helper para formatear tiempo
 const formatTimestamp = (timestamp) => {
   const now = new Date();
   const postDate = new Date(timestamp);
