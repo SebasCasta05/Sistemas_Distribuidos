@@ -18,7 +18,17 @@ function Inicio() {
   const careers = [
     "Ingeniería de Sistemas", "Medicina", "Derecho",
     "Administración de Empresas", "Psicología", "Contaduría Pública",
-    "Ingeniería Civil", "Arquitectura", "Enfermería", "Economía"
+    "Ingeniería Civil", "Arquitectura", "Enfermería", "Economía", "Trabajo social", "Tecnología en telecomunicaciones", 
+    "Tecnología en sistemas", "Tecnología en mecánica", "Tecnología en gestión empresarial", "Tecnología en Electrónica",
+    "Sociología", "Química", "Odontología", "Negocios internacionales", "Musica", "Mercadeo internacional", "Medicina Veterinaria",
+    "Medicina", "Matemáticas", "Licenciatura en Teologia", "Licenciatura en Matemáticas", "Licenciatura  en Educación Infantil",
+    "Licenciatura en Educación Fisica", "Licenciatura en Educación Basica", "Jurisprudencia", "Ingeniería Topografica", "Ingeniería Química",
+    "Ingeniería Mecatronica", "Ingeniería Matematica", "Ingeniería Industrial", "Ingeniería Electronica", "Ingeniería Electromecánica", 
+    "Ingeniería Electrica", "Ingeniería en Telecomunicaciones", "Ingeniería de Sistemas", "Ingeniería de Minas", "Ingeniería de Alimentos",
+    "Ingeniería Civil", "Ingeniería Catastral y Geodesia", "Ingeniería Biomédica", "Ingeniería Ambiental", "Ingeniería Agronómica",
+    "Ingeniería Agrícola", "Historia", "Fisica", "Finanzas y Relaciones Internacionales", "Filosofía", "Enfermeria", "Economía", "Diseño Grafico",
+    "Diseño de Modas", "Diseño", "Derecho", "Contaduría Publica", "Comunicación Social", "Comercio Internacional", "Ciencia Politica y Gobierno",
+    "Ciencia Politica", "Biología", "Bacterologia", "Artes Plasticas", "Artes Escenicas", "Arquitectura", "Antropología", "Administración de Empresas"
   ];
   const additionalFilters = [
     "Ranking / Puntaje", "Semilleros de investigación", "Duración del programa",
