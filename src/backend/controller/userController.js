@@ -1,36 +1,45 @@
 import pool from "../config/db.js";
 import bcrypt from "bcrypt";
 
-// Registrar usuario
 
 export const registerUser = async (req, res) => {
   try {
     const { nombre, apellido, email, password, direccion, telefono, tipo_usuario } = req.body;
 
-    if (!nombre || !apellido || !email || !password || !tipo_usuario) {
+    if (!nombre || !email || !password || !tipo_usuario) {
       return res.status(400).json({ message: "Faltan campos obligatorios" });
     }
 
-    // esto verifica si el correo ya existe
+    
     const userExists = await pool.query("SELECT * FROM usuario WHERE email = $1", [email]);
     if (userExists.rows.length > 0) {
       return res.status(400).json({ message: "El usuario ya está registrado" });
     }
 
-    // poner hash a la contraseña
+   
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
+    
     const newUser = await pool.query(
-      `INSERT INTO usuario (nombre, apellido, email, password_hash, direccion, telefono, tipo_usuario) 
-       VALUES ($1,$2,$3,$4,$5,$6,$7) 
+      `INSERT INTO usuario (nombre, apellido, email, password_hash, direccion, telefono, tipo_usuario)
+       VALUES ($1,$2,$3,$4,$5,$6,$7)
        RETURNING id_usuario, nombre, apellido, email, direccion, telefono, tipo_usuario, fecha_creacion`,
-      [nombre, apellido, email, passwordHash, direccion || null, telefono || null, tipo_usuario || "estudiante"]
+      [nombre, apellido || null, email, passwordHash, direccion || null, telefono || null, tipo_usuario]
+    );
+
+    
+    const tipo = await pool.query(
+      "SELECT descripcion FROM TipoUsuario WHERE idTipoUsuario = $1",
+      [tipo_usuario]
     );
 
     res.status(201).json({
       message: "Usuario registrado correctamente",
-      user: newUser.rows[0]
+      user: {
+        ...newUser.rows[0],
+        tipo_usuario_descripcion: tipo.rows[0]?.descripcion || "Desconocido"
+      }
     });
   } catch (err) {
     console.error("❌ Error en registerUser:", err);
@@ -38,12 +47,19 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// Login usuario
+
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const result = await pool.query("SELECT * FROM usuario WHERE email = $1", [email]);
+    const result = await pool.query(
+      `SELECT u.*, t.descripcion AS tipo_usuario_descripcion
+       FROM usuario u
+       JOIN TipoUsuario t ON u.tipo_usuario = t.idTipoUsuario
+       WHERE u.email = $1`,
+      [email]
+    );
+
     if (result.rows.length === 0) {
       return res.status(400).json({ message: "Usuario no encontrado" });
     }
@@ -65,6 +81,7 @@ export const loginUser = async (req, res) => {
         direccion: user.direccion,
         telefono: user.telefono,
         tipo_usuario: user.tipo_usuario,
+        tipo_usuario_descripcion: user.tipo_usuario_descripcion
       }
     });
   } catch (err) {
@@ -73,7 +90,7 @@ export const loginUser = async (req, res) => {
   }
 };
 
-// Obtener usuario por ID
+
 export const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -83,8 +100,11 @@ export const getUserById = async (req, res) => {
     }
 
     const result = await pool.query(
-      `SELECT id_usuario, nombre, apellido, email, direccion, telefono, tipo_usuario, fecha_creacion 
-       FROM usuario WHERE id_usuario = $1`,
+      `SELECT u.id_usuario, u.nombre, u.apellido, u.email, u.direccion, u.telefono, 
+              u.tipo_usuario, t.descripcion AS tipo_usuario_descripcion, u.fecha_creacion
+       FROM usuario u
+       JOIN TipoUsuario t ON u.tipo_usuario = t.idTipoUsuario
+       WHERE u.id_usuario = $1`,
       [id]
     );
 
@@ -99,7 +119,7 @@ export const getUserById = async (req, res) => {
   }
 };
 
-// Actualizar usuario
+
 export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -117,14 +137,23 @@ export const updateUser = async (req, res) => {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    res.json(result.rows[0]);
+    const tipo = await pool.query(
+      "SELECT descripcion FROM TipoUsuario WHERE idTipoUsuario = $1",
+      [tipo_usuario]
+    );
+
+    res.json({
+      ...result.rows[0],
+      tipo_usuario_descripcion: tipo.rows[0]?.descripcion || "Desconocido"
+    });
 
   } catch (err) {
     console.error("❌ Error en updateUser:", err);
     res.status(500).json({ message: "Error en el servidor" });
   }
 };
-// Eliminar usuario
+
+
 export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;

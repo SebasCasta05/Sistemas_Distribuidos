@@ -22,7 +22,7 @@ function Register() {
       email: e.target.email.value.trim(),
       direccion: e.target.direccion.value.trim(),
       password: e.target.password.value.trim(),
-      tipo_usuario: "estudiante", // o "admin"
+      tipo_usuario: 1, // 🔹 Por defecto: "Usuario" (ajusta el ID según tu BD)
     };
 
     try {
@@ -59,72 +59,78 @@ function Register() {
           <h2 className="register-title">Crear Cuenta</h2>
           <form className="register-form" onSubmit={handleSubmit}>
             <div className="form-group">
-              <label htmlFor="name">Nombre</label>
-              <input 
-                type="text" 
-                id="name" 
-                name="nombre" 
-                placeholder="Ingresa tu nombre" 
-                required 
+              <label htmlFor="nombre">Nombre</label>
+              <input
+                type="text"
+                id="nombre"
+                name="nombre"
+                placeholder="Ingresa tu nombre"
+                required
                 disabled={loading}
               />
             </div>
+
             <div className="form-group">
               <label htmlFor="apellido">Apellido</label>
-              <input 
-                type="text" 
-                id="apellido" 
-                name="apellido" 
-                placeholder="Ingresa tu apellido" 
-                required 
+              <input
+                type="text"
+                id="apellido"
+                name="apellido"
+                placeholder="Ingresa tu apellido"
+                required
                 disabled={loading}
               />
             </div>
+
             <div className="form-group">
               <label htmlFor="telefono">Teléfono</label>
-              <input 
-                type="text" 
-                id="telefono" 
-                name="telefono" 
-                placeholder="Ingresa tu teléfono" 
+              <input
+                type="text"
+                id="telefono"
+                name="telefono"
+                placeholder="Ingresa tu teléfono"
                 disabled={loading}
               />
             </div>
+
             <div className="form-group">
               <label htmlFor="email">Correo electrónico</label>
-              <input 
-                type="email" 
-                id="email" 
-                name="email" 
-                placeholder="ejemplo@email.com" 
-                required 
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="ejemplo@email.com"
+                required
                 disabled={loading}
               />
             </div>
+
             <div className="form-group">
               <label htmlFor="direccion">Dirección</label>
-              <input 
-                type="text" 
-                id="direccion" 
-                name="direccion" 
-                placeholder="Calle 12 No. 12" 
+              <input
+                type="text"
+                id="direccion"
+                name="direccion"
+                placeholder="Calle 12 No. 12"
                 disabled={loading}
               />
             </div>
+
             <div className="form-group">
               <label htmlFor="password">Contraseña</label>
-              <input 
-                type="password" 
-                id="password" 
-                name="password" 
-                placeholder="********" 
-                required 
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="********"
+                required
                 disabled={loading}
               />
             </div>
+
             <div className="button-group">
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="register-btn"
                 disabled={loading}
               >
@@ -134,6 +140,7 @@ function Register() {
                 Volver al Login
               </Link>
             </div>
+
             {error && <div className="error">{error}</div>}
             {mensaje && <div className="success">{mensaje}</div>}
           </form>
