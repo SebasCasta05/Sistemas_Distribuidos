@@ -17,7 +17,6 @@ body {
   flex-direction: column;
 }
 
-/* Header Styles */
 .header {
   background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
   color: white;
@@ -99,13 +98,11 @@ body {
   box-shadow: 0 8px 25px rgba(245, 127, 23, 0.4);
 }
 
-/* Main Content */
 .main {
   flex: 1;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 }
 
-/* Hero Section */
 .hero {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -200,7 +197,6 @@ body {
   font-size: 0.875rem;
 }
 
-/* Filters Section */
 .filters {
   padding: 5rem 0;
 }
@@ -408,7 +404,6 @@ body {
   font-weight: 500;
 }
 
-/* Selected Filters */
 .selected-filters {
   background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
   border-radius: 16px;
@@ -544,7 +539,6 @@ body {
   box-shadow: 0 15px 40px rgba(33, 150, 243, 0.4);
 }
 
-/* Results Section */
 .results-section {
   padding: 4rem 0;
   background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
@@ -607,7 +601,6 @@ body {
   border-color: #cbd5e0;
 }
 
-/* No Results */
 .no-results {
   text-align: center;
   padding: 4rem 2rem;
@@ -655,14 +648,12 @@ body {
   box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
 }
 
-/* University Grid */
 .university-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 2rem;
 }
 
-/* University Card */
 .university-card {
   background: white;
   border-radius: 20px;
@@ -934,7 +925,6 @@ body {
   opacity: 0.7;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .header__container {
     flex-direction: column;

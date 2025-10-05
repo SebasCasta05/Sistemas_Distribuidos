@@ -12,7 +12,6 @@ import "../componentesCss/muro.css";
 const API_URL = "http://localhost:5000/api/publicaciones";
 
 const Muro = () => {
-  // Estados principales
   const [currentCategory, setCurrentCategory] = useState("vivienda");
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -39,12 +38,10 @@ const Muro = () => {
     { value: 'hibrido', label: 'Híbrido' }
   ];
 
-  // Cargar publicaciones al montar y al cambiar categoría
   useEffect(() => {
     fetchPosts();
   }, [currentCategory]);
 
-  // Función para cargar publicaciones desde la BD
   const fetchPosts = async () => {
     setLoading(true);
     try {
@@ -57,10 +54,9 @@ const Muro = () => {
       
       const data = await response.json();
       
-      // Mantener id unificado (usar id_publicacion del backend)
       const transformedPosts = data.map(item => ({
         ...item,
-        id: item.id_publicacion, // ✅ usamos el id_publicacion
+        id: item.id_publicacion,
         tipo_publicacion: currentCategory
       }));
       
@@ -73,7 +69,6 @@ const Muro = () => {
     }
   };
 
-  // Función para formatear timestamp
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return '';
     
@@ -91,24 +86,20 @@ const Muro = () => {
     return `hace ${diffDays} días`;
   };
 
-  // Handler para cambiar categoría
   const handleCategoryChange = (category) => {
     setCurrentCategory(category);
   };
 
-  // Handler para enviar formulario y crear publicación
   const handleSubmit = async (formData) => {
     setLoading(true);
 
     try {
       const endpoint = formData.type === 'vivienda' ? 'viviendas' : 'empleos';
 
-      // Simular que el usuario está logueado
       const id_usuario = localStorage.getItem("id_usuario") || 1; // 🔑 cámbialo según tu login real
       
       let body;
       if (formData.type === 'vivienda') {
-        // Convertir precio a número
         const priceNumber = parseFloat(formData.price.replace(/[$.,\s]/g, ''));
         
         if (isNaN(priceNumber)) {
@@ -159,7 +150,6 @@ const Muro = () => {
       
       setShowCreateForm(false);
       
-      // Recargar publicaciones
       await fetchPosts();
       
     } catch (error) {
@@ -170,7 +160,6 @@ const Muro = () => {
     }
   };
 
-  // Handler para contactar via WhatsApp
   const handleContact = (phone) => {
     const cleanPhone = phone.replace(/[\s\-\(\)\+]/g, '');
     
@@ -188,7 +177,6 @@ const Muro = () => {
     window.open(whatsappUrl, '_blank');
   };
 
-  // Handlers para el visor de imágenes
   const openImageViewer = (images, startIndex = 0) => {
     setImageViewer({
       isOpen: true,
@@ -217,7 +205,6 @@ const Muro = () => {
     });
   };
 
-  // Handlers para login
   const handleLoginInputChange = (e) => {
     const { name, value } = e.target;
     setLoginData(prev => ({ ...prev, [name]: value }));
@@ -256,14 +243,12 @@ const Muro = () => {
             />
           )}
 
-          {/* Indicador de carga */}
           {loading && !showCreateForm && (
             <div style={{ textAlign: 'center', padding: '40px' }}>
               <p style={{ fontSize: '18px', color: '#666' }}>Cargando publicaciones...</p>
             </div>
           )}
 
-          {/* Mensaje si no hay publicaciones */}
           {!loading && posts.length === 0 && (
             <div style={{ textAlign: 'center', padding: '40px' }}>
               <p style={{ fontSize: '18px', color: '#666' }}>

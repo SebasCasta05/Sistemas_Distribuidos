@@ -1,4 +1,3 @@
-/* ===== ESTILOS GLOBALES BÁSICOS ===== */
 * {
   margin: 0;
   padding: 0;
@@ -24,7 +23,7 @@ html, body {
   overflow-x: hidden;
 }
 
-/* ===== HEADER Y FOOTER (MANTENIDOS) ===== */
+/* ===== HEADER Y FOOTER ===== */
 .header {
   background: #2196f3;
   color: white;
@@ -177,7 +176,6 @@ html, body {
   box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
 }
 
-/* Botón de guardar cuando está editando */
 .btn-primary.saving {
   background: #4caf50;
 }
@@ -186,7 +184,6 @@ html, body {
   background: #43a047;
 }
 
-/* Mejorar botones de upload */
 .cover-edit-btn,
 .avatar-edit-btn {
   cursor: pointer;
@@ -204,7 +201,6 @@ html, body {
   background: white;
 }
 
-/* Hero Section - MEJORADO */
 .perfil-hero {
   position: relative;
   height: 280px;
@@ -257,7 +253,6 @@ html, body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-/* Header del perfil - MEJORADO */
 .perfil-header {
   padding: 0 40px 30px;
   position: relative;
@@ -346,7 +341,6 @@ html, body {
   align-items: center;
 }
 
-/* Botones */
 .btn-primary {
   background: #2196f3;
   color: white;
@@ -408,7 +402,6 @@ html, body {
   color: white;
 }
 
-/* Contenido principal - MEJORADO */
 .perfil-content {
   display: grid;
   grid-template-columns: 380px 1fr;
@@ -419,7 +412,6 @@ html, body {
   background: #f8fafc;
 }
 
-/* Sidebar */
 .perfil-sidebar {
   display: flex;
   flex-direction: column;
@@ -466,7 +458,6 @@ html, body {
   color: #6b7280;
 }
 
-/* Estadísticas */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -513,7 +504,6 @@ html, body {
   font-size: 14px;
 }
 
-/* Sección de publicaciones */
 .posts-section {
   background: white;
   border-radius: 16px;
@@ -538,7 +528,6 @@ html, body {
   gap: 10px;
 }
 
-/* Tabs */
 .content-tabs {
   display: flex;
   border-bottom: 1px solid #f1f5f9;
@@ -565,7 +554,6 @@ html, body {
   color: #2196f3;
 }
 
-/* Posts - MEJORADO */
 .posts-container {
   padding: 32px;
   display: grid;
@@ -723,7 +711,6 @@ html, body {
   color: #374151;
 }
 
-/* Estado vacío */
 .empty-state {
   text-align: center;
   padding: 60px 40px;
@@ -750,7 +737,6 @@ html, body {
   line-height: 1.5;
 }
 
-/* Botón eliminar - MEJORADO */
 .btn-delete {
   background: #fee;
   border: 1px solid #fcc;
@@ -817,7 +803,6 @@ html, body {
   color: #1d3557;
 }
 
-/* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 1024px) {
   .perfil-content {
     grid-template-columns: 1fr;
@@ -942,7 +927,6 @@ html, body {
   }
 }
 
-/* Ocultar barras de scroll */
 ::-webkit-scrollbar {
   width: 0px;
   background: transparent;

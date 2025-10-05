@@ -59,7 +59,6 @@ const PostForm = ({ onSubmit, onClose, loading }) => {
       </div>
       
       <form onSubmit={handleSubmit}>
-        {/* Tipo de publicación */}
         <div className="form-group">
           <label className="form-label">Tipo de Publicación</label>
           <select 
@@ -74,7 +73,6 @@ const PostForm = ({ onSubmit, onClose, loading }) => {
           </select>
         </div>
 
-        {/* Título */}
         <div className="form-group">
           <label className="form-label">Título</label>
           <input 
@@ -88,7 +86,6 @@ const PostForm = ({ onSubmit, onClose, loading }) => {
           />
         </div>
 
-        {/* Campos específicos por tipo */}
         {formData.type === 'vivienda' ? (
           <>
             <div className="form-grid">
@@ -151,7 +148,6 @@ const PostForm = ({ onSubmit, onClose, loading }) => {
               </div>
             </div>
 
-            {/* Sección de URL de imagen */}
             <div className="form-group">
               <label className="form-label">URL de la imagen</label>
               <input 
@@ -168,7 +164,6 @@ const PostForm = ({ onSubmit, onClose, loading }) => {
             </div>
           </>
         ) : (
-          // Campos para empleo
           <>
             <div className="form-grid">
               <div>
@@ -257,7 +252,6 @@ const PostForm = ({ onSubmit, onClose, loading }) => {
           </>
         )}
 
-        {/* Descripción */}
         <div className="form-group">
           <label className="form-label">Descripción</label>
           <textarea 

@@ -37,7 +37,6 @@ function Login() {
 
       setMensaje("Inicio de sesión exitoso ✅");
 
-      // Guardar usuario en sessionStorage
       sessionStorage.setItem("user", JSON.stringify(data.user));
 
       setTimeout(() => {

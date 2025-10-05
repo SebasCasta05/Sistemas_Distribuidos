@@ -3,11 +3,9 @@ import pool from "../config/db.js";
 
 const router = express.Router();
 
-/* ============================================================
-   📦 RUTAS PARA VIVIENDAS
-============================================================ */
+//RUTAS PARA VIVIENDAS
 
-// Obtener todas las publicaciones de vivienda
+//mostrar publicaciones de viviendas
 router.get("/viviendas", async (req, res) => {
   try {
     const result = await pool.query(
@@ -113,9 +111,7 @@ router.post("/viviendas", async (req, res) => {
   }
 });
 
-/* ============================================================
-   💼 RUTAS PARA EMPLEOS
-============================================================ */
+  //RUTAS PARA EMPLEOS
 
 // Obtener todas las publicaciones de empleo
 router.get("/empleos", async (req, res) => {
@@ -233,9 +229,7 @@ router.post("/empleos", async (req, res) => {
   }
 });
 
-/* ============================================================
-   👤 PUBLICACIONES DE UN USUARIO
-============================================================ */
+  //PUBLICACIONES DE UN USUARIO
 
 router.get("/usuario/:id_usuario", async (req, res) => {
   const { id_usuario } = req.params;
@@ -270,9 +264,7 @@ router.get("/usuario/:id_usuario", async (req, res) => {
   }
 });
 
-/* ============================================================
-   🗑️ ELIMINAR PUBLICACIÓN
-============================================================ */
+  //ELIMINAR PUBLICACIÓN
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
 
@@ -280,11 +272,9 @@ router.delete("/:id", async (req, res) => {
   try {
     await client.query("BEGIN");
 
-    // Primero eliminar en tablas hijas
     await client.query("DELETE FROM publicacionesvivienda WHERE id_publicacion = $1", [id]);
     await client.query("DELETE FROM publicacionesempleo WHERE id_publicacion = $1", [id]);
 
-    // Luego eliminar en tabla principal
     const delResult = await client.query(
       "DELETE FROM publicaciones WHERE id_publicacion = $1 RETURNING id_publicacion",
       [id]

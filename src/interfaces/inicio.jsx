@@ -1,7 +1,3 @@
-// =========================
-// File: Inicio.jsx
-// Path suggestion: src/components/Inicio.jsx (o donde tengas el original)
-// =========================
 import React, { useState, useMemo } from "react";
 import { MapPin, GraduationCap, Filter, Search, Users, BookOpen, Award, Globe, DollarSign } from "lucide-react";
 import "../componentesCss/inicio.css";
@@ -30,7 +26,6 @@ function Inicio() {
     "Internacionalización", "Oferta de posgrados", "Infraestructura"
   ];
 
-  // Datos mock (igual que antes, aquí puedes conectar a tu API más adelante)
   const allUniversities = [
     {
       id: 1,
@@ -160,7 +155,6 @@ function Inicio() {
       <Header />
 
       <main className="main">
-        {/* Hero Section */}
         <section className="hero">
           <div className="hero__container">
             <div className="hero__content">
@@ -187,7 +181,6 @@ function Inicio() {
           </div>
         </section>
 
-        {/* Filters Section */}
         <section className="filters">
           <div className="filters__container">
             <div className="filters__header">
@@ -233,7 +226,6 @@ function Inicio() {
                 />
               </div>
 
-              {/* Selected Filters */}
               {(selectedCities.length > 0 || selectedCareers.length > 0 || selectedFilters.length > 0) && (
                 <div className="selected-filters">
                   <div className="selected-filters__header">
@@ -285,7 +277,6 @@ function Inicio() {
           </div>
         </section>
 
-        {/* Resultados de Universidades */}
         {showResults && (
           <section className="results-section">
             <div className="results__container">

@@ -1,7 +1,6 @@
 const PostCard = ({ post, handleContact, openImageViewer, cities, workModes }) => {
   return (
     <div className="post-card">
-      {/* Mostrar imagen si es vivienda */}
       {post.img && (
         <div className="post-image-container">
           <img
@@ -17,25 +16,20 @@ const PostCard = ({ post, handleContact, openImageViewer, cities, workModes }) =
       )}
 
       <div className="post-content">
-        {/* Badge de categoría */}
         <span className={`post-category ${post.tipo_publicacion || 'vivienda'}`}>
           {post.tipo_publicacion === 'vivienda' ? '🏠 Vivienda' : '💼 Empleo'}
         </span>
 
-        {/* Título */}
         <h3 className="post-title">{post.titulo}</h3>
 
-        {/* 🔹 Nombre del autor */}
         {post.autor_nombre && (
           <p className="post-author">
             <strong>Publicado por:</strong> {post.autor_nombre} {post.autor_apellido}
           </p>
         )}
 
-        {/* Descripción */}
         <p className="post-description">{post.descripcion}</p>
 
-        {/* Información específica según el tipo */}
         <div className="post-info">
           {post.tipo_publicacion === 'vivienda' || post.precio ? (
             <>
@@ -60,7 +54,6 @@ const PostCard = ({ post, handleContact, openImageViewer, cities, workModes }) =
           )}
         </div>
 
-        {/* Habilidades para empleos */}
         {post.habilidades_minimas && (
           <div className="post-skills">
             <strong>Habilidades:</strong>
@@ -72,7 +65,6 @@ const PostCard = ({ post, handleContact, openImageViewer, cities, workModes }) =
           </div>
         )}
 
-        {/* Botón de contacto */}
         <button 
           className="contact-button"
           onClick={() => handleContact(post.telefono)}
@@ -84,7 +76,6 @@ const PostCard = ({ post, handleContact, openImageViewer, cities, workModes }) =
   );
 };
 
-// Función helper para formatear tiempo
 const formatTimestamp = (timestamp) => {
   const now = new Date();
   const postDate = new Date(timestamp);

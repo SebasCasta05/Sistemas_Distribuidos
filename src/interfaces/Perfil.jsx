@@ -26,14 +26,12 @@ function Perfil() {
     window.location.href = '/login';
   };
 
-  // Cargar datos del usuario y sus publicaciones (todo en un único flujo asíncrono)
   useEffect(() => {
     const loadProfileAndPublicaciones = async () => {
       setLoading(true);
       setErrorMsg('');
       setStatusMsg('');
 
-      // Soportar distintos nombres posibles en sessionStorage/localStorage
       const raw =
         sessionStorage.getItem('user') ||
         sessionStorage.getItem('usuario') ||
@@ -56,7 +54,6 @@ function Perfil() {
 
       const id = sessionUser.id_usuario || sessionUser.id;
 
-      // Obtener info del usuario (intento; si falla, seguimos con publicaciones)
       try {
         const userRes = await fetch(`http://localhost:5000/api/users/${id}`);
         if (!userRes.ok) {
@@ -64,7 +61,6 @@ function Perfil() {
           throw new Error(errBody.message || 'Error al obtener usuario');
         }
         const userData = await userRes.json();
-        // Normalizar algunos campos para usarlos en la UI
         const normalizedUser = {
           ...userData,
           email: userData.email || userData.correo || userData.mail || userData.email_usuario,
@@ -73,11 +69,9 @@ function Perfil() {
         setUserInfo(normalizedUser);
       } catch (err) {
         console.error('Error al obtener usuario:', err);
-        // Mostrar mensaje, pero no interrumpir la carga de publicaciones
         setErrorMsg(prev => prev || (err.message || 'Error cargando perfil'));
       }
 
-      // Obtener publicaciones del usuario a través de tu endpoint consolidado
       try {
         const pubsRes = await fetch(`http://localhost:5000/api/publicaciones/usuario/${id}`);
         if (!pubsRes.ok) {
@@ -87,23 +81,18 @@ function Perfil() {
         const pubsData = await pubsRes.json();
         console.log('Publicaciones recibidas del backend:', pubsData);
 
-        // Normalizar cada publicación a la forma esperada por la UI:
-        // { id_publicacion, titulo, descripcion, tipo_publicacion, detalle_1, detalle_2, created_at, autor_nombre, autor_apellido }
         const normalized = (Array.isArray(pubsData) ? pubsData : []).map((item) => {
-          // Intentamos extraer el id de varias formas para compatibilidad
           const id_pub =
             item.id_publicacion ||
             item.id_publicacionvivienda ||
             item.id_publicacionempleo ||
             item.id;
 
-          // Tipo: preferimos el campo explícito, si no, inferimos
           const tipo =
             item.tipo_publicacion ||
             item.tipo ||
             (item.precio !== undefined ? 'vivienda' : item.empresa ? 'empleo' : '');
 
-          // detalle_1 y detalle_2 ya pueden venir como 'detalle_1' / 'detalle_2' desde la query
           const detalle1 = item.detalle_1 || item.ciudad || item.empresa || '';
           const detalle2 =
             item.detalle_2 ||
@@ -128,14 +117,12 @@ function Perfil() {
       } catch (err) {
         console.error('Error cargando publicaciones:', err);
         setErrorMsg(prev => prev || (err.message || 'No se pudieron cargar las publicaciones'));
-        // mantener publicaciones como array vacío
       } finally {
         setLoading(false);
       }
     };
 
     loadProfileAndPublicaciones();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleProfileImageChange = (e) => {
@@ -176,7 +163,6 @@ function Perfil() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Error al actualizar perfil');
       setUserInfo(data);
-      // Actualizar sessionStorage para coherencia con el resto de la app
       try {
         sessionStorage.setItem('user', JSON.stringify(data));
       } catch (e) {
@@ -184,7 +170,6 @@ function Perfil() {
       }
       setIsEditing(false);
       setStatusMsg('Perfil actualizado correctamente ✅');
-      // limpiar mensaje después de un tiempo
       setTimeout(() => setStatusMsg(''), 4000);
     } catch (err) {
       setErrorMsg(err.message || 'Error actualizando perfil');
@@ -201,12 +186,10 @@ function Perfil() {
     return date.toLocaleDateString();
   };
 
-  // ---- ELIMINAR publicación desde perfil (llama a backend)
   const handleDeletePublicacion = async (id_publicacion) => {
     const confirmacion = window.confirm('¿Estás seguro de eliminar esta publicación?');
     if (!confirmacion) return;
 
-    // Evitar doble clic / mostrar estado de borrado
     setDeletingIds(prev => new Set(prev).add(id_publicacion));
     setErrorMsg('');
     setStatusMsg('');
@@ -219,21 +202,17 @@ function Perfil() {
       const resBody = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        // manejar distintos formatos de error
         const message = resBody.message || resBody.error || 'Error al eliminar publicación';
         throw new Error(message);
       }
 
-      // Actualiza UI local (optimista)
       setPublicaciones(prev => prev.filter(p => p.id_publicacion !== id_publicacion));
       setStatusMsg('Publicación eliminada correctamente ✅');
-      // limpiar mensaje y estado de borrado después de un tiempo
       setTimeout(() => setStatusMsg(''), 3500);
     } catch (err) {
       console.error('Error eliminando publicación:', err);
       setErrorMsg(err.message || 'No se pudo eliminar la publicación');
     } finally {
-      // quitar id del set deletingIds
       setDeletingIds(prev => {
         const next = new Set(prev);
         next.delete(id_publicacion);
@@ -279,7 +258,6 @@ function Perfil() {
       <main className="main-content">
         <div className="perfil-container">
 
-          {/* AVATAR + INFO */}
           <div className="perfil-header">
 
             <div className="perfil-info">
@@ -329,7 +307,6 @@ function Perfil() {
             </div>
           </div>
 
-          {/* CONTENIDO PRINCIPAL */}
           <div className="perfil-content">
             <aside className="perfil-sidebar">
               <div className="info-card">
@@ -373,7 +350,6 @@ function Perfil() {
                         </small>
                         <div className="post-footer">Publicado el {formatDate(pub.created_at)}</div>
 
-                        {/* Botón eliminar */}
                         <div style={{ marginTop: 8 }}>
                           <button
                             className="btn-delete"

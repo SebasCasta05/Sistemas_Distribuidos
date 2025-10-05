@@ -1,9 +1,8 @@
 import pool from "../config/db.js";
 import bcrypt from "bcrypt";
 
-// =====================
 // Registrar usuario
-// =====================
+
 export const registerUser = async (req, res) => {
   try {
     const { nombre, apellido, email, password, direccion, telefono, tipo_usuario } = req.body;
@@ -12,17 +11,16 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ message: "Faltan campos obligatorios" });
     }
 
-    // Verificar si el correo ya existe
+    // esto verifica si el correo ya existe
     const userExists = await pool.query("SELECT * FROM usuario WHERE email = $1", [email]);
     if (userExists.rows.length > 0) {
       return res.status(400).json({ message: "El usuario ya está registrado" });
     }
 
-    // Hashear contraseña
+    // poner hash a la contraseña
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
-    // Insertar usuario en BD
     const newUser = await pool.query(
       `INSERT INTO usuario (nombre, apellido, email, password_hash, direccion, telefono, tipo_usuario) 
        VALUES ($1,$2,$3,$4,$5,$6,$7) 
@@ -40,9 +38,7 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// =====================
 // Login usuario
-// =====================
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -77,9 +73,7 @@ export const loginUser = async (req, res) => {
   }
 };
 
-// =====================
 // Obtener usuario por ID
-// =====================
 export const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -105,9 +99,7 @@ export const getUserById = async (req, res) => {
   }
 };
 
-// =====================
 // Actualizar usuario
-// =====================
 export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -125,7 +117,6 @@ export const updateUser = async (req, res) => {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    // 👇 En vez de devolver {message, user: ...}
     res.json(result.rows[0]);
 
   } catch (err) {
@@ -133,9 +124,7 @@ export const updateUser = async (req, res) => {
     res.status(500).json({ message: "Error en el servidor" });
   }
 };
-// =====================
 // Eliminar usuario
-// =====================
 export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;

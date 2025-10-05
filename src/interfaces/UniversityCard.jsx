@@ -1,7 +1,3 @@
-
-// =========================
-// File: UniversityCard.jsx
-// =========================
 import React from 'react';
 import { MapPin, Star, Heart, ExternalLink, DollarSign, Award } from 'lucide-react';
 
