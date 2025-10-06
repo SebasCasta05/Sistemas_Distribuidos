@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { MapPin, GraduationCap, Filter, Search, Users, BookOpen, Award, Globe, DollarSign } from "lucide-react";
 import "../componentesCss/inicio.css";
 import Header from './Header.jsx';
@@ -13,93 +13,56 @@ function Inicio() {
   const [selectedCareers, setSelectedCareers] = useState([]);
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [showResults, setShowResults] = useState(false);
+  const [universities, setUniversities] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [careers, setCareers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const cities = ["Barranquilla", "Bogotá", "Medellín", "Cartagena", "Cali"];
-  const careers = [
-    "Ingeniería de Sistemas", "Medicina", "Derecho",
-    "Administración de Empresas", "Psicología", "Contaduría Pública",
-    "Ingeniería Civil", "Arquitectura", "Enfermería", "Economía", "Trabajo social", "Tecnología en telecomunicaciones", 
-    "Tecnología en sistemas", "Tecnología en mecánica", "Tecnología en gestión empresarial", "Tecnología en Electrónica",
-    "Sociología", "Química", "Odontología", "Negocios internacionales", "Musica", "Mercadeo internacional", "Medicina Veterinaria",
-    "Medicina", "Matemáticas", "Licenciatura en Teologia", "Licenciatura en Matemáticas", "Licenciatura  en Educación Infantil",
-    "Licenciatura en Educación Fisica", "Licenciatura en Educación Basica", "Jurisprudencia", "Ingeniería Topografica", "Ingeniería Química",
-    "Ingeniería Mecatronica", "Ingeniería Matematica", "Ingeniería Industrial", "Ingeniería Electronica", "Ingeniería Electromecánica", 
-    "Ingeniería Electrica", "Ingeniería en Telecomunicaciones", "Ingeniería de Sistemas", "Ingeniería de Minas", "Ingeniería de Alimentos",
-    "Ingeniería Civil", "Ingeniería Catastral y Geodesia", "Ingeniería Biomédica", "Ingeniería Ambiental", "Ingeniería Agronómica",
-    "Ingeniería Agrícola", "Historia", "Fisica", "Finanzas y Relaciones Internacionales", "Filosofía", "Enfermeria", "Economía", "Diseño Grafico",
-    "Diseño de Modas", "Diseño", "Derecho", "Contaduría Publica", "Comunicación Social", "Comercio Internacional", "Ciencia Politica y Gobierno",
-    "Ciencia Politica", "Biología", "Bacterologia", "Artes Plasticas", "Artes Escenicas", "Arquitectura", "Antropología", "Administración de Empresas"
-  ];
   const additionalFilters = [
     "Ranking / Puntaje", "Semilleros de investigación", "Duración del programa",
     "Horario (Diurno / Nocturno / FDS)", "Modalidad de titulación", "Becas o financiamiento",
     "Internacionalización", "Oferta de posgrados", "Infraestructura"
   ];
 
-  const allUniversities = [
-    {
-      id: 1,
-      name: "Universidad Nacional de Colombia",
-      city: "Bogotá",
-      careers: ["Ingeniería de Sistemas", "Medicina", "Derecho"],
-      rating: 4.8,
-      reviews: 2450,
-      ranking: 1,
-      tuition: "Pública",
-      image: "https://upload.wikimedia.org/wikipedia/commons/7/73/Plaza_Che%2C_Bogot%C3%A1.jpg",
-      features: ["Ranking / Puntaje", "Semilleros de investigación", "Becas o financiamiento"],
-      description: "La universidad más prestigiosa del país con excelencia académica.",
-      accreditation: "Acreditación de Alta Calidad"
-    },
-    {
-      id: 2,
-      name: "Universidad de los Andes",
-      city: "Bogotá",
-      careers: ["Administración de Empresas", "Ingeniería Civil", "Economía"],
-      rating: 4.7,
-      reviews: 1890,
-      ranking: 2,
-      tuition: "$15M - $20M",
-      image: "https://via.placeholder.com/400x200/9C27B0/white?text=Uniandes",
-      features: ["Internacionalización", "Oferta de posgrados", "Infraestructura"],
-      description: "Reconocida por su calidad académica e investigación de vanguardia.",
-      accreditation: "Acreditación de Alta Calidad"
-    },
-    {
-      id: 3,
-      name: "Universidad Pontificia Bolivariana",
-      city: "Medellín",
-      careers: ["Arquitectura", "Psicología", "Ingeniería de Sistemas"],
-      rating: 4.5,
-      reviews: 1234,
-      ranking: 5,
-      tuition: "$8M - $12M",
-      image: "https://via.placeholder.com/400x200/FF5722/white?text=UPB",
-      features: ["Modalidad de titulación", "Semilleros de investigación"],
-      description: "Universidad católica con tradición en formación integral.",
-      accreditation: "Acreditación de Alta Calidad"
-    },
-    {
-      id: 4,
-      name: "Universidad del Norte",
-      city: "Barranquilla",
-      careers: ["Medicina", "Contaduría Pública", "Administración de Empresas"],
-      rating: 4.6,
-      reviews: 987,
-      ranking: 8,
-      tuition: "$10M - $15M",
-      image: "https://via.placeholder.com/400x200/4CAF50/white?text=UNINORTE",
-      features: ["Internacionalización", "Infraestructura", "Becas o financiamiento"],
-      description: "Líder en la región Caribe con programas innovadores.",
-      accreditation: "Acreditación de Alta Calidad"
-    }
-  ];
+  // Cargar datos iniciales
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        
+        // Obtener universidades
+        const uniResponse = await fetch('http://localhost:5000/api/universidades');
+        const uniData = await uniResponse.json();
+        setUniversities(uniData);
+        
+        // Obtener ciudades
+        const citiesResponse = await fetch('http://localhost:5000/api/universidades/ciudades');
+        const citiesData = await citiesResponse.json();
+        setCities(citiesData);
+        
+        // Obtener carreras
+        const careersResponse = await fetch('http://localhost:5000/api/universidades/carreras');
+        const careersData = await careersResponse.json();
+        setCareers(careersData);
+        
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        // En caso de error, usar datos de ejemplo
+        setCities(["Barranquilla", "Bogotá", "Medellín", "Cartagena", "Cali"]);
+        setCareers(["Ingeniería de Sistemas", "Medicina", "Derecho", "Administración de Empresas"]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const stats = [
-    { icon: Users, label: "Universidades", value: "XXX+" },
-    { icon: BookOpen, label: "Programas", value: "XXX+" },
+    { icon: Users, label: "Universidades", value: `${universities.length}+` },
+    { icon: BookOpen, label: "Programas", value: `${careers.length}+` },
     { icon: Award, label: "Becas", value: "XXX+" },
-    { icon: Globe, label: "Ciudades", value: "5+" }
+    { icon: Globe, label: "Ciudades", value: `${cities.length}+` }
   ];
 
   const toggleFilter = (filterName) => {
@@ -150,15 +113,29 @@ function Inicio() {
   };
 
   const filteredUniversities = useMemo(() => {
-    return allUniversities.filter(uni => {
+    return universities.filter(uni => {
       const cityMatch = selectedCities.length === 0 || selectedCities.includes(uni.city);
       const careerMatch = selectedCareers.length === 0 ||
                          selectedCareers.some(career => uni.careers.includes(career));
-      const filterMatch = selectedFilters.length === 0 ||
-                         selectedFilters.some(filter => uni.features.includes(filter));
+      
+      // Para los filtros adicionales, usar lógica básica por ahora
+      const filterMatch = selectedFilters.length === 0;
+      
       return cityMatch && careerMatch && filterMatch;
     });
-  }, [selectedCities, selectedCareers, selectedFilters, allUniversities]);
+  }, [selectedCities, selectedCareers, selectedFilters, universities]);
+
+  if (loading) {
+    return (
+      <div className="app">
+        <Header />
+        <div className="loading">
+          <p>Cargando universidades...</p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="app">
@@ -172,7 +149,7 @@ function Inicio() {
                 Encuentra la <span className="hero__highlight">Universidad</span> Perfecta
               </h1>
               <p className="hero__subtitle">
-                Explora más de 150 universidades, compara programas académicos y toma la mejor decisión para tu futuro profesional.
+                Explora {universities.length} universidades, {careers.length} programas académicos y toma la mejor decisión para tu futuro profesional.
               </p>
             </div>
             <div className="hero__stats">
@@ -331,4 +308,3 @@ function Inicio() {
 }
 
 export default Inicio;
-
