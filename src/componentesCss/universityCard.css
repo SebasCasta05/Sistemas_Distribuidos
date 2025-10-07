@@ -1,0 +1,185 @@
+/* universityCard.css */
+.university-card {
+  border: 1px solid #e1e5e9;
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.university-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.university-card__image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  background-color: #f5f5f5;
+}
+
+.university-card__info {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.university-card__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #1a202c;
+  line-height: 1.3;
+}
+
+.university-card__description {
+  color: #718096;
+  margin-bottom: 15px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+
+.university-card__details {
+  margin-bottom: 20px;
+  space-y: 8px;
+}
+
+.university-card__detail {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: #4a5568;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.university-card__detail svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.university-card__careers {
+  word-wrap: break-word;
+}
+
+.university-card__actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.university-card__favorite {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.875rem;
+}
+
+.university-card__favorite:hover {
+  background: #f7fafc;
+}
+
+.university-card__favorite.liked {
+  background: #fff5f5;
+  border-color: #fed7d7;
+}
+
+.university-card__like-text {
+  font-size: 0.875rem;
+  color: #4a5568;
+}
+
+.university-card__favorite.liked .university-card__like-text {
+  color: #e53e3e;
+}
+
+.university-card__link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #3182ce;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.university-card__link:hover {
+  background: #2c5aa0;
+}
+
+/* Skeleton loading */
+.university-card__skeleton {
+  height: 100%;
+}
+
+.skeleton-image {
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+.skeleton-content {
+  padding: 20px;
+}
+
+.skeleton-title {
+  height: 24px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  animation: loading 1.5s infinite;
+}
+
+.skeleton-text {
+  height: 16px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  animation: loading 1.5s infinite;
+}
+
+.skeleton-details {
+  margin-top: 15px;
+}
+
+.skeleton-detail {
+  height: 14px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  margin-bottom: 6px;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

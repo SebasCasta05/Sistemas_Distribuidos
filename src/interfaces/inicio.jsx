@@ -26,34 +26,28 @@ function Inicio() {
 
   // Cargar datos iniciales
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        
-        // Obtener universidades
-        const uniResponse = await fetch('http://localhost:5000/api/universidades');
-        const uniData = await uniResponse.json();
-        setUniversities(uniData);
-        
-        // Obtener ciudades
-        const citiesResponse = await fetch('http://localhost:5000/api/universidades/ciudades');
-        const citiesData = await citiesResponse.json();
-        setCities(citiesData);
-        
-        // Obtener carreras
-        const careersResponse = await fetch('http://localhost:5000/api/universidades/carreras');
-        const careersData = await careersResponse.json();
-        setCareers(careersData);
-        
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        // En caso de error, usar datos de ejemplo
-        setCities(["Barranquilla", "Bogotá", "Medellín", "Cartagena", "Cali"]);
-        setCareers(["Ingeniería de Sistemas", "Medicina", "Derecho", "Administración de Empresas"]);
-      } finally {
-        setLoading(false);
-      }
-    };
+    // En el useEffect donde obtienes las universidades
+const fetchData = async () => {
+  try {
+    setLoading(true);
+    
+    const user = JSON.parse(sessionStorage.getItem("user"));
+    const url = user && user.id_usuario 
+      ? `http://localhost:5000/api/universidades?id_usuario=${user.id_usuario}`
+      : 'http://localhost:5000/api/universidades';
+    
+    // Obtener universidades
+    const uniResponse = await fetch(url);
+    const uniData = await uniResponse.json();
+    setUniversities(uniData);
+    
+    // ... resto del código
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
     fetchData();
   }, []);

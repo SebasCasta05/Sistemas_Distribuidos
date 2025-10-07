@@ -4,6 +4,7 @@ import userRoutes from "./routes/userRoutes.js";
 import publicacionesRoutes from "./routes/publicacionesRouters.js";
 import universidadesRoutes from "./routes/universidadesRoutes.js";
 
+
 const app = express();
 
 app.use(cors());
