@@ -198,21 +198,21 @@ html, body {
 .perfil-container {
   max-width: 100%;
   margin: 0;
-  background: white;
+  background: #f8fafc;
 }
 
 .perfil-hero {
   position: relative;
-  height: 280px;
-  background: #e5e7eb;
+  height: 320px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   overflow: hidden;
   background-size: cover;
   background-position: center;
 }
 
 .perfil-cover {
-  height: 280px;
-  background: #e5e7eb;
+  height: 320px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   position: relative;
   overflow: hidden;
   background-size: cover;
@@ -225,82 +225,104 @@ html, body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.15));
+  background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.3));
   pointer-events: none;
 }
 
 .cover-edit-btn {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
+  top: 24px;
+  right: 24px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
   border: none;
-  padding: 12px 16px;
-  border-radius: 25px;
+  padding: 12px 20px;
+  border-radius: 30px;
   display: flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 600;
   color: #374151;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .cover-edit-btn:hover {
   background: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
 }
 
 .perfil-header {
-  padding: 0 40px 30px;
+  padding: 0 40px 36px;
   position: relative;
   background: white;
-  border-bottom: 1px solid #f1f5f9;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  margin-top: 120px;
 }
 
 .avatar-container {
   display: flex;
   justify-content: center;
-  margin-top: -80px;
-  margin-bottom: 24px;
+  margin-top: -90px;
+  margin-bottom: 28px;
 }
 
 .perfil-avatar {
   position: relative;
   display: inline-block;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .perfil-avatar img {
-  width: 140px;
-  height: 140px;
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
-  border: 5px solid white;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  border: 6px solid white;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.08);
   object-fit: cover;
+  transition: all 0.3s ease;
+}
+
+.perfil-avatar:hover img {
+  box-shadow: 0 16px 40px rgba(0,0,0,0.2), 0 4px 12px rgba(0,0,0,0.1);
+  transform: scale(1.02);
 }
 
 .avatar-edit-btn {
   position: absolute;
-  bottom: 5px;
-  right: 5px;
-  width: 36px;
-  height: 36px;
+  bottom: 8px;
+  right: 8px;
+  width: 44px;
+  height: 44px;
   background: #2196f3;
-  border: 3px solid white;
+  border: 4px solid white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: white;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
 }
 
 .avatar-edit-btn:hover {
   background: #1976d2;
-  transform: scale(1.1);
+  transform: scale(1.15) rotate(8deg);
+  box-shadow: 0 6px 16px rgba(33, 150, 243, 0.5);
 }
 
 .perfil-info {
@@ -308,31 +330,62 @@ html, body {
   justify-content: space-between;
   align-items: flex-end;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 24px;
+  
 }
 
 .perfil-main-info {
   text-align: center;
   flex-grow: 1;
+  animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .perfil-nombre {
-  font-size: 32px;
-  font-weight: 700;
+  font-size: 36px;
+  font-weight: 800;
   color: #1f2937;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .perfil-titulo {
   font-size: 18px;
   color: #6b7280;
-  margin-bottom: 12px;
-  font-weight: 500;
+  margin-bottom: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 13px;
 }
 
 .perfil-ubicacion {
   color: #9ca3af;
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.perfil-ubicacion span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: #f3f4f6;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.perfil-ubicacion span:hover {
+  background: #e5e7eb;
+  transform: translateY(-1px);
 }
 
 .perfil-acciones {
@@ -342,47 +395,56 @@ html, body {
 }
 
 .btn-primary {
-  background: #2196f3;
+  background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
   color: white;
   border: none;
-  padding: 12px 24px;
-  border-radius: 25px;
-  font-weight: 600;
+  padding: 14px 28px;
+  border-radius: 30px;
+  font-weight: 700;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
-  transition: all 0.3s ease;
+  gap: 10px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 14px;
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .btn-primary:hover {
-  background: #1976d2;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(33, 150, 243, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(-1px);
 }
 
 .btn-secondary {
   background: white;
   color: #64748b;
   border: 2px solid #e2e8f0;
-  padding: 12px 24px;
-  border-radius: 25px;
+  padding: 14px 28px;
+  border-radius: 30px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
-  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 700;
   font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .btn-secondary:hover {
   background: #f8fafc;
   border-color: #cbd5e1;
   color: #475569;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
 }
 
 .btn-outline {
@@ -422,22 +484,35 @@ html, body {
 
 .info-card, .stats-card, .bio-card {
   background: white;
-  border-radius: 16px;
-  padding: 28px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  border: 1px solid #f1f5f9;
   width: 100%;
   min-width: 0;
+  transition: all 0.3s ease;
+}
+
+.info-card:hover, .stats-card:hover, .bio-card:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
 }
 
 .card-title {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 19px;
+  font-weight: 800;
   color: #1f2937;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 14px;
+}
+
+.card-title svg {
+  color: #2196f3;
 }
 
 .info-list {
@@ -851,7 +926,7 @@ html, body {
   }
   
   .avatar-container {
-    margin-top: -50px;
+    margin-top: 250px;
   }
   
   .perfil-nombre {
@@ -934,4 +1009,254 @@ html, body {
 
 html {
   scrollbar-width: none;
+}
+
+/* ===== MODALES PARA IMÁGENES ===== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1f2937;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-title svg {
+  color: #2196f3;
+}
+
+.modal-description {
+  color: #6b7280;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  margin-bottom: 12px;
+}
+
+.modal-input:focus {
+  outline: none;
+  border-color: #2196f3;
+  box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.1);
+}
+
+.modal-error {
+  color: #ef4444;
+  font-size: 13px;
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  background: #fee2e2;
+  border-radius: 8px;
+  border-left: 4px solid #ef4444;
+}
+
+.image-preview {
+  margin: 20px 0;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 2px dashed #e5e7eb;
+}
+
+.preview-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.image-preview img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: block;
+  margin: 0 auto;
+}
+
+.cover-preview img {
+  width: 100%;
+  height: 150px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.btn-modal-cancel {
+  flex: 1;
+  padding: 14px 24px;
+  border: 2px solid #e5e7eb;
+  background: white;
+  color: #6b7280;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-modal-cancel:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+  transform: translateY(-2px);
+}
+
+.btn-modal-save {
+  flex: 1;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-modal-save:hover {
+  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(33, 150, 243, 0.4);
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    padding: 24px;
+    width: 95%;
+  }
+  
+  .modal-title {
+    font-size: 20px;
+  }
+  
+  .modal-actions {
+    flex-direction: column;
+  }
+  
+  .btn-modal-cancel,
+  .btn-modal-save {
+    width: 100%;
+  }
+}
+
+
+
+
+/* Estilos para el modal de visualización de imagen */
+.image-view-modal {
+  max-width: 90%;
+  max-height: 90%;
+  width: auto;
+}
+
+.image-view-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+  max-height: 70vh;
+}
+
+.full-size-image {
+  max-width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Hacer que la imagen de perfil sea clickeable */
+.perfil-avatar img {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.perfil-avatar img:hover {
+  transform: scale(1.05);
+}
+
+/* Hacer que el área de portada sea clickeable */
+.perfil-hero {
+  cursor: pointer;
+  position: relative;
+}
+
+.perfil-hero::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  transition: background-color 0.2s ease;
+}
+
+.perfil-hero:hover::after {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Asegurar que el botón de cambiar portada esté por encima */
+.cover-edit-btn {
+  z-index: 10;
+  position: relative;
 }

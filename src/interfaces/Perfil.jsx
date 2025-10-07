@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  User, Mail, GraduationCap, Calendar, Edit3, Camera, Award, Trash2
+  User, Mail, GraduationCap, Calendar, Edit3, Camera, Award, Trash2, Link as LinkIcon, Eye
 } from 'lucide-react';
 import Header from './Header.jsx';
 import Footer from './Footer.jsx';
@@ -16,7 +16,15 @@ function Perfil() {
   const [statusMsg, setStatusMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [publicaciones, setPublicaciones] = useState([]);
-  const [deletingIds, setDeletingIds] = useState(new Set()); // evitar doble click al eliminar
+  const [deletingIds, setDeletingIds] = useState(new Set());
+
+  // Estados para los modales de imagen
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showCoverModal, setShowCoverModal] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [currentImage, setCurrentImage] = useState('');
+  const [tempImageUrl, setTempImageUrl] = useState('');
+  const [imageError, setImageError] = useState('');
 
   const handleLogout = () => {
     sessionStorage.removeItem('user');
@@ -67,6 +75,14 @@ function Perfil() {
           id_usuario: userData.id_usuario || userData.id || userData.user_id,
         };
         setUserInfo(normalizedUser);
+
+        // Cargar imágenes si existen
+        if (normalizedUser.profile_image || normalizedUser.imagen_url) {
+          setProfileImage(normalizedUser.profile_image || normalizedUser.imagen_url);
+        }
+        if (normalizedUser.cover_image) {
+          setCoverImage(normalizedUser.cover_image);
+        }
       } catch (err) {
         console.error('Error al obtener usuario:', err);
         setErrorMsg(prev => prev || (err.message || 'Error cargando perfil'));
@@ -79,7 +95,6 @@ function Perfil() {
           throw new Error(errBody.message || 'Error al obtener publicaciones');
         }
         const pubsData = await pubsRes.json();
-        console.log('Publicaciones recibidas del backend:', pubsData);
 
         const normalized = (Array.isArray(pubsData) ? pubsData : []).map((item) => {
           const id_pub =
@@ -124,16 +139,6 @@ function Perfil() {
 
     loadProfileAndPublicaciones();
   }, []);
-
-  const handleProfileImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) setProfileImage(URL.createObjectURL(file));
-  };
-
-  const handleCoverImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) setCoverImage(URL.createObjectURL(file));
-  };
 
   const handleInputChange = (field, value) => {
     setUserInfo((prev) => ({ ...prev, [field]: value }));
@@ -221,6 +226,147 @@ function Perfil() {
     }
   };
 
+  // Funciones para manejar las imágenes por URL
+  const handleOpenProfileModal = () => {
+    setShowProfileModal(true);
+    setTempImageUrl('');
+    setImageError('');
+  };
+
+  const handleOpenCoverModal = () => {
+    setShowCoverModal(true);
+    setTempImageUrl('');
+    setImageError('');
+  };
+
+  const handleViewImage = (imageUrl, isProfile = true) => {
+    setCurrentImage({
+      url: imageUrl,
+      type: isProfile ? 'Perfil' : 'Portada'
+    });
+    setShowImageModal(true);
+  };
+
+  const handleCloseModals = () => {
+    setShowProfileModal(false);
+    setShowCoverModal(false);
+    setShowImageModal(false);
+    setTempImageUrl('');
+    setImageError('');
+    setCurrentImage('');
+  };
+
+  const validateImageUrl = (url) => {
+    if (!url.trim()) {
+      setImageError('Por favor ingresa una URL');
+      return false;
+    }
+    
+    // Validar que sea una URL válida
+    try {
+      new URL(url);
+    } catch (e) {
+      setImageError('URL inválida. Debe comenzar con http:// o https://');
+      return false;
+    }
+
+    // Validar que termine en una extensión de imagen común
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
+    const urlLower = url.toLowerCase();
+    const hasValidExtension = imageExtensions.some(ext => urlLower.includes(ext));
+    
+    if (!hasValidExtension) {
+      setImageError('La URL debe apuntar a una imagen (jpg, png, gif, webp, svg)');
+      return false;
+    }
+
+    return true;
+  };
+
+  // Nueva función para guardar imagen de perfil usando tu endpoint específico
+  // Nueva función para guardar imagen de perfil usando tu endpoint específico
+const handleSaveProfileImage = async () => {
+  if (!validateImageUrl(tempImageUrl)) return;
+
+  if (!userInfo || !userInfo.id_usuario) {
+    setImageError('No se pudo identificar al usuario');
+    return;
+  }
+
+  setImageError('');
+  
+  try {
+    const response = await fetch(`http://localhost:5000/api/users/${userInfo.id_usuario}/imagen`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ imagen_url: tempImageUrl }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Error al guardar la imagen.");
+    }
+
+    // ✅ Actualiza automáticamente la imagen de perfil sin recargar
+    const nuevaImagen = data.imagen_url || tempImageUrl;
+    setProfileImage(nuevaImagen);
+
+    // Actualiza también el objeto del usuario en memoria
+    const updatedUser = { ...userInfo, imagen_url: nuevaImagen, profile_image: nuevaImagen };
+    setUserInfo(updatedUser);
+
+    // Guarda el cambio en sessionStorage o localStorage
+    try {
+      sessionStorage.setItem('user', JSON.stringify(updatedUser));
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    } catch (e) {
+      console.warn('No se pudo actualizar sessionStorage/localStorage:', e);
+    }
+
+    setStatusMsg('Imagen de perfil actualizada ✅');
+    setTimeout(() => setStatusMsg(''), 3000);
+    handleCloseModals();
+  } catch (error) {
+    console.error("Error:", error);
+    setImageError("No se pudo conectar con el servidor.");
+  }
+};
+
+  // Función para guardar imagen de portada (manteniendo la original)
+  const handleSaveCoverImage = async () => {
+    if (!validateImageUrl(tempImageUrl)) return;
+
+    setImageError('');
+    setCoverImage(tempImageUrl);
+
+    // Guardar en el backend usando el endpoint general
+    try {
+      const updatedUser = { ...userInfo, cover_image: tempImageUrl };
+      const res = await fetch(`http://localhost:5000/api/users/${userInfo.id_usuario}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedUser),
+      });
+      
+      if (!res.ok) {
+        throw new Error('Error al guardar la imagen');
+      }
+      
+      const data = await res.json();
+      setUserInfo(data);
+      sessionStorage.setItem('user', JSON.stringify(data));
+      
+      setStatusMsg('Imagen de portada actualizada ✅');
+      setTimeout(() => setStatusMsg(''), 3000);
+    } catch (err) {
+      console.error('Error guardando imagen:', err);
+      setErrorMsg('No se pudo guardar la imagen en el servidor');
+    }
+
+    handleCloseModals();
+  };
+
   if (loading) {
     return (
       <div className="app-container">
@@ -258,7 +404,21 @@ function Perfil() {
       <main className="main-content">
         <div className="perfil-container">
 
+
           <div className="perfil-header">
+            <div className="avatar-container">
+              <div className="perfil-avatar">
+                <img 
+                  src={profileImage} 
+                  alt="Avatar" 
+                  onClick={() => handleViewImage(profileImage, true)}
+                  style={{ cursor: 'pointer' }}
+                />
+                <button className="avatar-edit-btn" onClick={handleOpenProfileModal}>
+                  <LinkIcon size={20} />
+                </button>
+              </div>
+            </div>
 
             <div className="perfil-info">
               <div className="perfil-main-info">
@@ -381,6 +541,126 @@ function Perfil() {
         </div>
       </main>
       <Footer />
+
+      {/* Modal para imagen de perfil */}
+      {showProfileModal && (
+        <div className="modal-overlay" onClick={handleCloseModals}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2 className="modal-title">
+              <LinkIcon size={24} />
+              Cambiar Imagen de Perfil
+            </h2>
+            <p className="modal-description">Ingresa la URL de tu imagen de perfil</p>
+            
+            <input
+              type="text"
+              className="modal-input"
+              placeholder="https://ejemplo.com/imagen.jpg"
+              value={tempImageUrl}
+              onChange={(e) => {
+                setTempImageUrl(e.target.value);
+                setImageError('');
+              }}
+              onKeyPress={(e) => e.key === 'Enter' && handleSaveProfileImage()}
+            />
+            
+            {imageError && <p className="modal-error">{imageError}</p>}
+            
+            {tempImageUrl && !imageError && (
+              <div className="image-preview">
+                <p className="preview-label">Vista previa:</p>
+                <img 
+                  src={tempImageUrl} 
+                  alt="Preview" 
+                  onError={() => setImageError('No se pudo cargar la imagen. Verifica la URL.')}
+                />
+              </div>
+            )}
+            
+            <div className="modal-actions">
+              <button className="btn-modal-cancel" onClick={handleCloseModals}>
+                Cancelar
+              </button>
+              <button className="btn-modal-save" onClick={handleSaveProfileImage}>
+                Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal para imagen de portada */}
+      {showCoverModal && (
+        <div className="modal-overlay" onClick={handleCloseModals}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2 className="modal-title">
+              <LinkIcon size={24} />
+              Cambiar Imagen de Portada
+            </h2>
+            <p className="modal-description">Ingresa la URL de tu imagen de portada</p>
+            
+            <input
+              type="text"
+              className="modal-input"
+              placeholder="https://ejemplo.com/portada.jpg"
+              value={tempImageUrl}
+              onChange={(e) => {
+                setTempImageUrl(e.target.value);
+                setImageError('');
+              }}
+              onKeyPress={(e) => e.key === 'Enter' && handleSaveCoverImage()}
+            />
+            
+            {imageError && <p className="modal-error">{imageError}</p>}
+            
+            {tempImageUrl && !imageError && (
+              <div className="image-preview cover-preview">
+                <p className="preview-label">Vista previa:</p>
+                <img 
+                  src={tempImageUrl} 
+                  alt="Preview" 
+                  onError={() => setImageError('No se pudo cargar la imagen. Verifica la URL.')}
+                />
+              </div>
+            )}
+            
+            <div className="modal-actions">
+              <button className="btn-modal-cancel" onClick={handleCloseModals}>
+                Cancelar
+              </button>
+              <button className="btn-modal-save" onClick={handleSaveCoverImage}>
+                Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal para visualizar imagen */}
+      {showImageModal && currentImage && (
+        <div className="modal-overlay" onClick={handleCloseModals}>
+          <div className="modal-content image-view-modal" onClick={(e) => e.stopPropagation()}>
+            <h2 className="modal-title">
+              <Eye size={24} />
+              Imagen de {currentImage.type}
+            </h2>
+            
+            <div className="image-view-container">
+              <img 
+                src={currentImage.url} 
+                alt={`Imagen de ${currentImage.type}`}
+                className="full-size-image"
+              />
+            </div>
+            
+            <div className="modal-actions">
+              <button className="btn-modal-cancel" onClick={handleCloseModals}>
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

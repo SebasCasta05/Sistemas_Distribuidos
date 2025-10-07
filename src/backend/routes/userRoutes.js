@@ -4,7 +4,8 @@ import {
   loginUser, 
   getUserById, 
   updateUser, 
-  deleteUser 
+  deleteUser,
+  updateUserImage // 👈 nueva función que debes agregar en tu userController.js
 } from "../controller/userController.js";
 
 const router = express.Router();
@@ -23,5 +24,8 @@ router.put("/:id", updateUser);
 
 // Eliminar usuario
 router.delete("/:id", deleteUser);
+
+// ✅ NUEVA RUTA: Actualizar solo la imagen de perfil
+router.put("/:id/imagen", updateUserImage);
 
 export default router;
