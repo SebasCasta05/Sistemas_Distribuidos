@@ -4,7 +4,7 @@ import pool from "../config/db.js";
 
 const router = express.Router();
 
-// Obtener todas las universidades con sus datos
+// Obtener todas las universidades con sus datoss
 router.get("/", async (req, res) => {
   try {
     console.log("Intentando conectar a la base de datos...");

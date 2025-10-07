@@ -90,5 +90,5 @@ const formatTimestamp = (timestamp) => {
   if (diffDays === 1) return '1 día';
   return `${diffDays} días`;
 };
-
+//s
 export default PostCard;

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+//s
 const PostForm = ({ onSubmit, onClose, loading }) => {
   const [formData, setFormData] = useState({
     type: 'vivienda',

@@ -295,6 +295,6 @@ const Muro = () => {
       <Footer />
     </>
   );
-};
+};//s
 
 export default Muro;

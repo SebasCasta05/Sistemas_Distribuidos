@@ -18,5 +18,5 @@ const ImageViewer = ({ imageViewer, closeImageViewer, navigateImage }) => (
     <button className="viewer-nav next" onClick={() => navigateImage(1)}>▶</button>
   </div>
 );
-
+//s
 export default ImageViewer;

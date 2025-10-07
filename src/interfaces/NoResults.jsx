@@ -18,5 +18,6 @@ Limpiar filtros
 );
 }
 
+//s
 
 export default NoResults;

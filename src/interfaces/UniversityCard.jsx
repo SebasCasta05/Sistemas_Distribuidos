@@ -68,5 +68,5 @@ function UniversityCard({ university = {} }) {
     </div>
   );
 }
-
+//s
 export default UniversityCard;

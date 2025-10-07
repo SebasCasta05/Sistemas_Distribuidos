@@ -2,7 +2,7 @@ import pool from "../config/db.js";
 import bcrypt from "bcrypt";
 
 // ============================================================
-// 📌 Registrar nuevo usuario
+// 📌 Registrar nuevo usuarios
 // ============================================================
 export const registerUser = async (req, res) => {
   try {

@@ -5,7 +5,7 @@ const router = express.Router();
 
 //RUTAS PARA VIVIENDAS
 
-//mostrar publicaciones de viviendas
+//mostrar publicaciones de viviendass
 router.get("/viviendas", async (req, res) => {
   try {
     const result = await pool.query(

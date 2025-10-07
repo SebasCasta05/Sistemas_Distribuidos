@@ -3,7 +3,7 @@ import pool from "../config/db.js";
 
 const router = express.Router();
 
-// ✅ Actualizar imagen de perfil.
+// ✅ Actualizar imagen de perfil..
 router.put("/usuarios/:id/imagen", async (req, res) => {
   const { id } = req.params;
   const { imagen_url } = req.body;

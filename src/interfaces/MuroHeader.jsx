@@ -6,5 +6,5 @@ const MuroHeader = () => (
     </p>
   </div>
 );
-
+//s
 export default MuroHeader;
