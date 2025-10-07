@@ -38,7 +38,7 @@ function Login() {
       setMensaje("Inicio de sesión exitoso ✅");
 
       sessionStorage.setItem("user", JSON.stringify(data.user));
-
+//s
       setTimeout(() => {
         window.location.href = "/perfil";
       }, 1500);
