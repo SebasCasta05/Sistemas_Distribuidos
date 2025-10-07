@@ -97,8 +97,26 @@ router.post("/viviendas", async (req, res) => {
         [id_publicacion, precio, ciudad, ubicacion, telefono, img || ""]
       );
 
+      // Obtener todos los datos completos para devolverlos al frontend
+      const fullResult = await client.query(
+        `SELECT 
+          pv.*, 
+          p.id_publicacion,
+          p.id_usuario,
+          p.titulo, 
+          p.descripcion, 
+          p.created_at,
+          u.nombre AS autor_nombre,
+          u.apellido AS autor_apellido
+         FROM publicacionesvivienda pv
+         JOIN publicaciones p ON pv.id_publicacion = p.id_publicacion
+         JOIN usuario u ON p.id_usuario = u.id_usuario
+         WHERE pv.id_publicacionvivienda = $1`,
+        [viviendaResult.rows[0].id_publicacionvivienda]
+      );
+
       await client.query("COMMIT");
-      res.status(201).json(viviendaResult.rows[0]);
+      res.status(201).json(fullResult.rows[0]);
     } catch (error) {
       await client.query("ROLLBACK");
       throw error;
@@ -215,8 +233,26 @@ router.post("/empleos", async (req, res) => {
         [id_publicacion, salario, empresa, modalidad, telefono, habilidades_minimas || "", estudios || ""]
       );
 
+      // Obtener todos los datos completos para devolverlos al frontend
+      const fullResult = await client.query(
+        `SELECT 
+          pe.*, 
+          p.id_publicacion,
+          p.id_usuario,
+          p.titulo, 
+          p.descripcion, 
+          p.created_at,
+          u.nombre AS autor_nombre,
+          u.apellido AS autor_apellido
+         FROM publicacionesempleo pe
+         JOIN publicaciones p ON pe.id_publicacion = p.id_publicacion
+         JOIN usuario u ON p.id_usuario = u.id_usuario
+         WHERE pe.id_publicacionempleo = $1`,
+        [empleoResult.rows[0].id_publicacionempleo]
+      );
+
       await client.query("COMMIT");
-      res.status(201).json(empleoResult.rows[0]);
+      res.status(201).json(fullResult.rows[0]);
     } catch (error) {
       await client.query("ROLLBACK");
       throw error;
