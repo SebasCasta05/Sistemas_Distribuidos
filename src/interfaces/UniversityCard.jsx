@@ -48,10 +48,16 @@ function UniversityCard({ university = {} }) {
             <DollarSign size={16} />
             <span>{university.tuition}</span>
           </div>
-          <button className="university-card__button">
-            Ver más
+          {/* Enlace externo a la página oficial */}
+          <a 
+            href={university.enlace_oficial} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="university-card__button"
+          >
+            Visitar Sitio
             <ExternalLink size={16} />
-          </button>
+          </a>
         </div>
 
         <div className="university-card__accreditation">
@@ -64,5 +70,3 @@ function UniversityCard({ university = {} }) {
 }
 
 export default UniversityCard;
-
-
