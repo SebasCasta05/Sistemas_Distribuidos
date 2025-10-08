@@ -4,7 +4,7 @@ import {
 } from 'lucide-react';
 import Header from './Header.jsx';
 import Footer from './Footer.jsx';
-import '../componentesCss/perfil.css';
+import "../componentesCss/Perfil.css";
 
 function Perfil() {
   const [isEditing, setIsEditing] = useState(false);
