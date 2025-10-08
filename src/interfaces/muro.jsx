@@ -50,18 +50,15 @@ const Muro = () => {
     { value: 'hibrido', label: 'Híbrido' }
   ];
 
-  // Sincroniza isLoggedIn con sessionStorage al cargar el componente
   useEffect(() => {
     const user = sessionStorage.getItem('user');
     setIsLoggedIn(!!user);
   }, []);
 
-  // Cargar publicaciones desde la base de datos al montar el componente y al cambiar de categoría
   useEffect(() => {
     fetchPosts();
   }, [currentCategory]);
 
-  // Función para cargar las publicaciones desde la base de datos
   const fetchPosts = async () => {
     setLoading(true);
     try {
@@ -72,9 +69,7 @@ const Muro = () => {
       }
       const data = await response.json();
 
-      // Transformar datos de la BD al formato del componente
       const transformedPosts = data.map(item => {
-        // Usa autor_nombre y autor_apellido para mostrar el nombre del autor
         let ownerName = '';
         if (item.autor_nombre && item.autor_apellido) {
           ownerName = `${item.autor_nombre} ${item.autor_apellido}`;
@@ -97,7 +92,6 @@ const Muro = () => {
             images: item.img ? [item.img] : [],
             timestamp: formatTimestamp(item.created_at),
             ownerName,
-            // Incluye todos los campos relevantes
             id_publicacion: item.id_publicacion,
             id_usuario: item.id_usuario,
           };
@@ -115,7 +109,6 @@ const Muro = () => {
             phone: item.telefono,
             timestamp: formatTimestamp(item.created_at),
             ownerName,
-            // Incluye todos los campos relevantes
             id_publicacion: item.id_publicacion,
             id_usuario: item.id_usuario,
           };
@@ -131,7 +124,6 @@ const Muro = () => {
     }
   };
 
-  // Función para formatear el timestamp
   const formatTimestamp = (timestamp) => {
     const now = new Date();
     const postDate = new Date(timestamp);
@@ -147,11 +139,9 @@ const Muro = () => {
     return `${diffDays} días`;
   };
 
-  // Funciones de login (puedes conectarlas a tu API de usuarios después)
   const handleLoginSubmit = (e) => {
     e.preventDefault();
     if (loginData.email && loginData.password) {
-      // Obtén el nombre antes del @ y capitaliza la primera letra
       let nombre_usuario = loginData.email.split('@')[0];
       nombre_usuario = nombre_usuario.charAt(0).toUpperCase() + nombre_usuario.slice(1);
       sessionStorage.setItem('user', JSON.stringify({ id_usuario: 1, email: loginData.email, nombre_usuario }));
@@ -173,7 +163,7 @@ const Muro = () => {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    sessionStorage.removeItem('user'); // Limpia la sesión al salir
+    sessionStorage.removeItem('user');
     alert('Sesión cerrada');
   };
 
@@ -188,7 +178,6 @@ const Muro = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 🔹 VALIDACIÓN DE SESIÓN
     const raw = sessionStorage.getItem('user');
     if (!raw) {
       setErrorMsg('No hay sesión activa. Por favor inicia sesión.');
@@ -198,7 +187,6 @@ const Muro = () => {
 
     const parsedUser = JSON.parse(raw);
     const userId = parsedUser.id_usuario || parsedUser.id;
-    // Usa nombre y apellido si existen, si no, usa nombre_usuario o email
     let nombre_usuario = '';
     if (parsedUser.nombre && parsedUser.apellido) {
       nombre_usuario = `${parsedUser.nombre} ${parsedUser.apellido}`;
@@ -213,13 +201,12 @@ const Muro = () => {
       return;
     }
 
-    // Solo mostrar mensaje si NO está logueado y quiere publicar
     if (!isLoggedIn) {
       setShowCreateForm(false);
       setShowLoginInfo(true);
       return;
     }
-    setShowLoginInfo(false); // <-- Oculta el mensaje si está logueado y publica
+    setShowLoginInfo(false);
     setLoading(true);
 
     try {
@@ -227,7 +214,6 @@ const Muro = () => {
       
       let body;
       if (formData.type === 'vivienda') {
-        // Convertir precio a número (eliminar $ y comas)
         const priceNumber = parseFloat(formData.price.replace(/[$.,\s]/g, ''));
         
         if (isNaN(priceNumber)) {
@@ -245,7 +231,7 @@ const Muro = () => {
           img: formData.imageUrl || '',
           descripcion: formData.description,
           id_usuario: userId,
-          nombre_usuario, // <-- SIEMPRE guarda el nombre completo
+          nombre_usuario,
         };
       } else {
         body = {
@@ -258,7 +244,7 @@ const Muro = () => {
           estudios: formData.studies,
           descripcion: formData.description,
           id_usuario: userId,
-          nombre_usuario, // <-- SIEMPRE guarda el nombre completo
+          nombre_usuario,
         };
       }
 
@@ -278,10 +264,8 @@ const Muro = () => {
       const newPost = await response.json();
       alert('¡Publicación creada exitosamente!');
 
-      // Agregar la publicación recién creada al estado para mostrarla de inmediato
       setPosts(prevPosts => [
         {
-          // Mapea los campos igual que in fetchPosts
           id: newPost.idpublicacionvivienda || newPost.idpublicacionempleo || Date.now(),
           type: formData.type,
           title: newPost.nombre,
@@ -302,7 +286,6 @@ const Muro = () => {
         ...prevPosts
       ]);
       
-      // Resetear formulario
       setFormData({
         type: 'vivienda',
         title: '',
@@ -321,7 +304,6 @@ const Muro = () => {
 
       setShowCreateForm(false);
 
-      // Recargar publicaciones para mostrar la nueva (opcional, puedes dejarlo si quieres sincronizar con backend)
       await fetchPosts();
       
     } catch (error) {
@@ -339,7 +321,7 @@ const Muro = () => {
   const handleCategoryChange = (category) => {
     setCurrentCategory(category);
     setFormData(prev => ({ ...prev, type: category }));
-    setShowLoginInfo(false); // <-- Oculta mensaje al cambiar categoría
+    setShowLoginInfo(false);
   };
 
   const handleContact = (phone) => {
@@ -387,14 +369,12 @@ const Muro = () => {
     });
   };
 
-  // Asegúrate de ocultar el mensaje cuando cambie el estado de login
   useEffect(() => {
     if (isLoggedIn) {
       setShowLoginInfo(false);
     }
   }, [isLoggedIn]);
 
-  // Asegúrate de ocultar el mensaje cuando cambie el estado de showCreateForm
   useEffect(() => {
     if (showCreateForm && isLoggedIn) {
       setShowLoginInfo(false);
@@ -416,7 +396,6 @@ const Muro = () => {
           </p>
         </div>
 
-        {/* Botones de categorías */}
         <div className="category-buttons">
           <button 
             className={`category-button ${currentCategory === 'vivienda' ? 'active' : 'inactive'}`}
@@ -451,14 +430,12 @@ const Muro = () => {
           </button>
         </div>
 
-        {/* Mensaje si no está logueado y quiere publicar */}
         {showLoginInfo && !isLoggedIn && !showCreateForm && (
           <div style={{ textAlign: 'center', color: '#b91c1c', margin: '20px 0', fontWeight: 'bold' }}>
             Debes iniciar sesión para poder crear una publicación.
           </div>
         )}
 
-        {/* Formulario de crear publicación */}
         {showCreateForm && (
           isLoggedIn ? (
             <div className="form-container">
@@ -475,7 +452,6 @@ const Muro = () => {
               </div>
               
               <form onSubmit={handleSubmit}>
-                {/* Tipo de publicación */}
                 <div className="form-group">
                   <label className="form-label">Tipo de Publicación</label>
                   <select 
@@ -490,7 +466,6 @@ const Muro = () => {
                   </select>
                 </div>
 
-                {/* Título */}
                 <div className="form-group">
                   <label className="form-label">Título</label>
                   <input 
@@ -504,7 +479,6 @@ const Muro = () => {
                   />
                 </div>
 
-                {/* Campos específicos por tipo */}
                 {formData.type === 'vivienda' ? (
                   <>
                     <div className="form-grid">
@@ -567,7 +541,6 @@ const Muro = () => {
                       </div>
                     </div>
 
-                    {/* Sección de URL de imagen */}
                     <div className="form-group">
                       <label className="form-label">URL de la imagen</label>
                       <input 
@@ -584,7 +557,6 @@ const Muro = () => {
                     </div>
                   </>
                 ) : (
-                  // Campos para empleo
                   <>
                     <div className="form-grid">
                       <div>
@@ -673,7 +645,6 @@ const Muro = () => {
                   </>
                 )}
 
-                {/* Descripción */}
                 <div className="form-group">
                   <label className="form-label">Descripción</label>
                   <textarea 
@@ -697,16 +668,13 @@ const Muro = () => {
             </div>
           ) : null
         )}
-        {/* Si intenta abrir el formulario sin login, no mostrar nada extra (el modal ya se muestra) */}
 
-        {/* Indicador de carga */}
         {loading && !showCreateForm && (
           <div style={{ textAlign: 'center', padding: '40px' }}>
             <p style={{ fontSize: '18px', color: '#666' }}>Cargando publicaciones...</p>
           </div>
         )}
 
-        {/* Mensaje si no hay publicaciones */}
         {!loading && posts.length === 0 && (
           <div style={{ textAlign: 'center', padding: '40px' }}>
             <p style={{ fontSize: '18px', color: '#666' }}>
@@ -718,7 +686,6 @@ const Muro = () => {
           </div>
         )}
 
-        {/* Posts container */}
         <div className="posts-grid">
           {filterPosts().map(post => (
             <div key={post.id} className="post-card">
@@ -750,7 +717,6 @@ const Muro = () => {
                 <h3 className="post-title">
                   {post.title}
                 </h3>
-                {/* Mostrar nombre del dueño */}
                 <div className="post-owner" style={{ fontSize: '13px', color: '#555', marginBottom: '6px' }}>
                   Publicado por: <strong>{post.ownerName}</strong>
                 </div>
@@ -800,7 +766,6 @@ const Muro = () => {
           ))}
         </div>
 
-        {/* Visor de imágenes en pantalla completa */}
         {imageViewer.isOpen && (
           <div className="image-viewer">
             <button
@@ -858,7 +823,6 @@ const Muro = () => {
           </div>
         )}
 
-        {/* Modal de Login */}
         {showLoginModal && (
           <div className="modal">
             <div className="modal-content">
@@ -920,7 +884,6 @@ const Muro = () => {
                     type="button"
                     onClick={() => {
                       setShowLoginModal(false);
-                      // navigate('/register'); - Descomenta si usas React Router
                     }}
                     className="modal-link"
                   >

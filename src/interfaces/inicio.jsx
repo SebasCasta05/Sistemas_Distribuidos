@@ -24,9 +24,7 @@ function Inicio() {
     "Internacionalización", "Oferta de posgrados", "Infraestructura"
   ];
 
-  // Cargar datos iniciales
   useEffect(() => {
-    // En el useEffect donde obtienes las universidades
 const fetchData = async () => {
   try {
     setLoading(true);
@@ -36,12 +34,10 @@ const fetchData = async () => {
       ? `http://localhost:5000/api/universidades?id_usuario=${user.id_usuario}`
       : 'http://localhost:5000/api/universidades';
     
-    // Obtener universidades
     const uniResponse = await fetch(url);
     const uniData = await uniResponse.json();
     setUniversities(uniData);
     
-    // ... resto del código
   } catch (error) {
     console.error("Error fetching data:", error);
   } finally {
@@ -112,7 +108,6 @@ const fetchData = async () => {
       const careerMatch = selectedCareers.length === 0 ||
                          selectedCareers.some(career => uni.careers.includes(career));
       
-      // Para los filtros adicionales, usar lógica básica por ahora
       const filterMatch = selectedFilters.length === 0;
       
       return cityMatch && careerMatch && filterMatch;

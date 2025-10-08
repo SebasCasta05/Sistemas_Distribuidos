@@ -18,7 +18,6 @@ function Perfil() {
   const [publicaciones, setPublicaciones] = useState([]);
   const [deletingIds, setDeletingIds] = useState(new Set());
 
-  // Estados para los modales de imagen
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showCoverModal, setShowCoverModal] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
@@ -76,7 +75,6 @@ function Perfil() {
         };
         setUserInfo(normalizedUser);
 
-        // Cargar imágenes si existen
         if (normalizedUser.profile_image || normalizedUser.imagen_url) {
           setProfileImage(normalizedUser.profile_image || normalizedUser.imagen_url);
         }
@@ -226,7 +224,6 @@ function Perfil() {
     }
   };
 
-  // Funciones para manejar las imágenes por URL
   const handleOpenProfileModal = () => {
     setShowProfileModal(true);
     setTempImageUrl('');
@@ -262,7 +259,6 @@ function Perfil() {
       return false;
     }
     
-    // Validar que sea una URL válida
     try {
       new URL(url);
     } catch (e) {
@@ -270,7 +266,6 @@ function Perfil() {
       return false;
     }
 
-    // Validar que termine en una extensión de imagen común
     const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
     const urlLower = url.toLowerCase();
     const hasValidExtension = imageExtensions.some(ext => urlLower.includes(ext));
@@ -283,8 +278,6 @@ function Perfil() {
     return true;
   };
 
-  // Nueva función para guardar imagen de perfil usando tu endpoint específico
-  // Nueva función para guardar imagen de perfil usando tu endpoint específico
 const handleSaveProfileImage = async () => {
   if (!validateImageUrl(tempImageUrl)) return;
 
@@ -308,15 +301,12 @@ const handleSaveProfileImage = async () => {
       throw new Error(data.message || "Error al guardar la imagen.");
     }
 
-    // ✅ Actualiza automáticamente la imagen de perfil sin recargar
     const nuevaImagen = data.imagen_url || tempImageUrl;
     setProfileImage(nuevaImagen);
 
-    // Actualiza también el objeto del usuario en memoria
     const updatedUser = { ...userInfo, imagen_url: nuevaImagen, profile_image: nuevaImagen };
     setUserInfo(updatedUser);
 
-    // Guarda el cambio en sessionStorage o localStorage
     try {
       sessionStorage.setItem('user', JSON.stringify(updatedUser));
       localStorage.setItem('user', JSON.stringify(updatedUser));
@@ -333,14 +323,12 @@ const handleSaveProfileImage = async () => {
   }
 };
 
-  // Función para guardar imagen de portada (manteniendo la original)
   const handleSaveCoverImage = async () => {
     if (!validateImageUrl(tempImageUrl)) return;
 
     setImageError('');
     setCoverImage(tempImageUrl);
 
-    // Guardar en el backend usando el endpoint general
     try {
       const updatedUser = { ...userInfo, cover_image: tempImageUrl };
       const res = await fetch(`http://localhost:5000/api/users/${userInfo.id_usuario}`, {
@@ -542,7 +530,6 @@ const handleSaveProfileImage = async () => {
       </main>
       <Footer />
 
-      {/* Modal para imagen de perfil */}
       {showProfileModal && (
         <div className="modal-overlay" onClick={handleCloseModals}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -589,7 +576,6 @@ const handleSaveProfileImage = async () => {
         </div>
       )}
 
-      {/* Modal para imagen de portada */}
       {showCoverModal && (
         <div className="modal-overlay" onClick={handleCloseModals}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -636,7 +622,6 @@ const handleSaveProfileImage = async () => {
         </div>
       )}
 
-      {/* Modal para visualizar imagen */}
       {showImageModal && currentImage && (
         <div className="modal-overlay" onClick={handleCloseModals}>
           <div className="modal-content image-view-modal" onClick={(e) => e.stopPropagation()}>

@@ -1,9 +1,8 @@
 import pool from "../config/db.js";
 
-// 📌 Obtener todas las universidades con información completa
 export const getUniversidades = async (req, res) => {
   try {
-    const { id_usuario } = req.query; // Opcional: para saber si el usuario ya dio like
+    const { id_usuario } = req.query;
 
     let query = `
       SELECT 
@@ -48,7 +47,6 @@ export const getUniversidades = async (req, res) => {
     const params = id_usuario ? [id_usuario] : [];
     const result = await pool.query(query, params);
     
-    // Procesar los datos para asegurar que tengan valores por defecto
     const universidadesProcesadas = result.rows.map(uni => ({
       ...uni,
       carreras: uni.carreras || 'Carreras no disponibles',
@@ -65,7 +63,6 @@ export const getUniversidades = async (req, res) => {
   }
 };
 
-// 📌 Obtener todas las ciudades donde hay universidades
 export const getCiudades = async (req, res) => {
   try {
     const result = await pool.query(`
@@ -81,7 +78,6 @@ export const getCiudades = async (req, res) => {
   }
 };
 
-// 📌 Obtener todas las carreras disponibles
 export const getCarreras = async (req, res) => {
   try {
     const result = await pool.query(`
@@ -97,7 +93,6 @@ export const getCarreras = async (req, res) => {
   }
 };
 
-// 📌 Buscar universidades con filtros
 export const buscarUniversidades = async (req, res) => {
   try {
     const { ciudad, carrera, acreditacion, id_usuario } = req.query;
@@ -164,7 +159,6 @@ export const buscarUniversidades = async (req, res) => {
 
     query += ` ORDER BY u.nombreuniversidad`;
 
-    // Si hay usuario autenticado, agregar al inicio de los parámetros
     if (id_usuario) {
       params.unshift(id_usuario);
     }
@@ -187,7 +181,6 @@ export const buscarUniversidades = async (req, res) => {
   }
 };
 
-// 📌 Verificar si una universidad está en likes de un usuario
 export const checkIfLiked = async (req, res) => {
   const { id_usuario, id_universidad } = req.body;
 
@@ -207,7 +200,6 @@ export const checkIfLiked = async (req, res) => {
   }
 };
 
-// 📌 Alternar like (agregar o eliminar)
 export const toggleLike = async (req, res) => {
   const { id_usuario, id_universidad } = req.body;
 
@@ -216,7 +208,6 @@ export const toggleLike = async (req, res) => {
   }
 
   try {
-    // Verificar si el usuario existe
     const userCheck = await pool.query(
       "SELECT id_usuario FROM usuario WHERE id_usuario = $1",
       [id_usuario]
@@ -226,7 +217,6 @@ export const toggleLike = async (req, res) => {
       return res.status(404).json({ message: "Usuario no encontrado." });
     }
 
-    // Verificar si la universidad existe
     const uniCheck = await pool.query(
       "SELECT iduniversidad FROM universidad WHERE iduniversidad = $1",
       [id_universidad]
@@ -242,13 +232,11 @@ export const toggleLike = async (req, res) => {
     );
 
     if (check.rows.length > 0) {
-      // Eliminar like
       await pool.query(
         "DELETE FROM likes WHERE id_usuario = $1 AND id_universidad = $2",
         [id_usuario, id_universidad]
       );
       
-      // Actualizar contador en universidad
       await pool.query(
         "UPDATE universidad SET likes_count = GREATEST(0, COALESCE(likes_count, 0) - 1) WHERE iduniversidad = $1",
         [id_universidad]
@@ -256,13 +244,11 @@ export const toggleLike = async (req, res) => {
       
       return res.json({ liked: false, message: "❌ Like eliminado." });
     } else {
-      // Agregar like
       await pool.query(
         "INSERT INTO likes (id_usuario, id_universidad) VALUES ($1, $2)",
         [id_usuario, id_universidad]
       );
       
-      // Actualizar contador en universidad
       await pool.query(
         "UPDATE universidad SET likes_count = COALESCE(likes_count, 0) + 1 WHERE iduniversidad = $1",
         [id_universidad]
@@ -273,7 +259,6 @@ export const toggleLike = async (req, res) => {
   } catch (error) {
     console.error("❌ Error al alternar like:", error);
     
-    // Si es error de duplicado
     if (error.code === '23505') {
       return res.status(400).json({ message: "Ya has dado like a esta universidad." });
     }
@@ -282,7 +267,6 @@ export const toggleLike = async (req, res) => {
   }
 };
 
-// 📌 Obtener universidades favoritas de un usuario
 export const getFavoritas = async (req, res) => {
   const { id_usuario } = req.params;
 
@@ -345,7 +329,6 @@ export const getFavoritas = async (req, res) => {
   }
 };
 
-// 📌 Obtener detalles completos de una universidad
 export const getUniversidadById = async (req, res) => {
   const { id } = req.params;
   const { id_usuario } = req.query;

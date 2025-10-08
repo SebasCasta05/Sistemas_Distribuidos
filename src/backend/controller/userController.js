@@ -1,9 +1,6 @@
 import pool from "../config/db.js";
 import bcrypt from "bcrypt";
 
-// ============================================================
-// 📌 Registrar nuevo usuarios
-// ============================================================
 export const registerUser = async (req, res) => {
   try {
     const { nombre, apellido, email, password, direccion, telefono, tipo_usuario, imagen_url } = req.body;
@@ -12,17 +9,14 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ message: "Faltan campos obligatorios" });
     }
 
-    // Verificar si ya existe el usuario
     const userExists = await pool.query("SELECT * FROM usuario WHERE email = $1", [email]);
     if (userExists.rows.length > 0) {
       return res.status(400).json({ message: "El usuario ya está registrado" });
     }
 
-    // Encriptar contraseña
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
-    // Insertar nuevo usuario (incluye imagen_url opcional)
     const newUser = await pool.query(
       `INSERT INTO usuario (nombre, apellido, email, password_hash, direccion, telefono, tipo_usuario, imagen_url)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
@@ -30,7 +24,6 @@ export const registerUser = async (req, res) => {
       [nombre, apellido || null, email, passwordHash, direccion || null, telefono || null, tipo_usuario, imagen_url || null]
     );
 
-    // Obtener descripción del tipo de usuario
     const tipo = await pool.query(
       "SELECT descripcion FROM TipoUsuario WHERE idTipoUsuario = $1",
       [tipo_usuario]
@@ -49,9 +42,6 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// ============================================================
-// 📌 Login de usuario
-// ============================================================
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -95,9 +85,6 @@ export const loginUser = async (req, res) => {
   }
 };
 
-// ============================================================
-// 📌 Obtener usuario por ID
-// ============================================================
 export const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -127,9 +114,6 @@ export const getUserById = async (req, res) => {
   }
 };
 
-// ============================================================
-// 📌 Actualizar usuario completo
-// ============================================================
 export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -163,9 +147,6 @@ export const updateUser = async (req, res) => {
   }
 };
 
-// ============================================================
-// 📌 Eliminar usuario
-// ============================================================
 export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -183,9 +164,6 @@ export const deleteUser = async (req, res) => {
   }
 };
 
-// ============================================================
-// 📌 Nueva función: Actualizar solo la imagen de perfil
-// ============================================================
 export const updateUserImage = async (req, res) => {
   const { id } = req.params;
   const { imagen_url } = req.body;
