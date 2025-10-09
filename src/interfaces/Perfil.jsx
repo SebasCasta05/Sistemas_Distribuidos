@@ -5,6 +5,8 @@ import {
 import Header from './Header.jsx';
 import Footer from './Footer.jsx';
 import "../componentesCss/Perfil.css";
+import Favoritas from "./Favoritas.jsx";
+
 
 function Perfil() {
   const [isEditing, setIsEditing] = useState(false);
@@ -522,6 +524,9 @@ const handleSaveProfileImage = async () => {
             </main>
           </div>
         </div>
+        <div className="favoritas-container">
+  <Favoritas idUsuario={userInfo?.id_usuario} />
+</div>
 
         <div style={{ padding: 12 }}>
           {statusMsg && <div style={{ color: 'green' }}>{statusMsg}</div>}
@@ -648,6 +653,7 @@ const handleSaveProfileImage = async () => {
       )}
     </div>
   );
+
 }
 
 export default Perfil;

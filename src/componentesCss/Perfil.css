@@ -1257,3 +1257,19 @@ html {
   z-index: 10;
   position: relative;
 }
+
+
+.favoritas-section {
+  margin-top: 3rem;
+  padding: 1rem;
+}
+
+.favoritas-section h2 {
+  color: #1e3a8a;
+}
+
+.favoritas-section .grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
