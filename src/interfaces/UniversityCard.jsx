@@ -78,6 +78,35 @@ function UniversityCard({ university = {} }) {
     }).format(amount);
   };
 
+  // Función para mostrar el rango de costos semestrales
+  const renderCostoSemestral = () => {
+    if (!university.costo_semestral) {
+      return "Consulta directamente";
+    }
+
+    const { minimo, maximo, tiene_rango } = university.costo_semestral;
+
+    if (tiene_rango) {
+      return (
+        <div className="costo-rango">
+          <div className="costo-valores">
+            {formatCurrency(minimo)} - {formatCurrency(maximo)}
+          </div>
+          <small className="costo-leyenda">por semestre</small>
+        </div>
+      );
+    } else {
+      return (
+        <div className="costo-rango">
+          <div className="costo-valores">
+            {formatCurrency(minimo)}
+          </div>
+          <small className="costo-leyenda">por semestre</small>
+        </div>
+      );
+    }
+  };
+
   if (!university || Object.keys(university).length === 0) {
     return (
       <div className="university-card">
@@ -129,7 +158,9 @@ function UniversityCard({ university = {} }) {
 
           <div className="university-card__detail">
             <DollarSign size={16} />
-            <span>{formatCurrency(university.costo)}</span>
+            <span className="university-card__costo">
+              {renderCostoSemestral()}
+            </span>
           </div>
 
           {university.carreras && university.carreras !== 'Carreras no disponibles' && (
