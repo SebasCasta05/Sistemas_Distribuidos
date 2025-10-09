@@ -17,6 +17,7 @@ function Inicio() {
   const [cities, setCities] = useState([]);
   const [careers, setCareers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const additionalFilters = [
     "Ranking / Puntaje", "Semilleros de investigación", "Duración del programa",
@@ -24,26 +25,58 @@ function Inicio() {
     "Internacionalización", "Oferta de posgrados", "Infraestructura"
   ];
 
+  // Cargar datos reales desde el backend
   useEffect(() => {
-const fetchData = async () => {
-  try {
-    setLoading(true);
-    
-    const user = JSON.parse(sessionStorage.getItem("user"));
-    const url = user && user.id_usuario 
-      ? `http://localhost:5000/api/universidades?id_usuario=${user.id_usuario}`
-      : 'http://localhost:5000/api/universidades';
-    
-    const uniResponse = await fetch(url);
-    const uniData = await uniResponse.json();
-    setUniversities(uniData);
-    
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const user = JSON.parse(sessionStorage.getItem("user"));
+        
+        // Cargar universidades, ciudades y carreras en paralelo
+        const baseUrl = 'http://localhost:5000/api/universidades';
+        const uniUrl = user && user.id_usuario 
+          ? `${baseUrl}?id_usuario=${user.id_usuario}`
+          : baseUrl;
+        
+        const [uniResponse, citiesResponse, careersResponse] = await Promise.all([
+          fetch(uniUrl),
+          fetch(`${baseUrl}/ciudades`),  // URL corregida
+          fetch(`${baseUrl}/carreras`)   // URL corregida
+        ]);
+
+        // Verificar respuestas
+        if (!uniResponse.ok) throw new Error('Error al cargar universidades');
+        if (!citiesResponse.ok) throw new Error('Error al cargar ciudades');
+        if (!careersResponse.ok) throw new Error('Error al cargar carreras');
+
+        const [uniData, citiesData, careersData] = await Promise.all([
+          uniResponse.json(),
+          citiesResponse.json(),
+          careersResponse.json()
+        ]);
+
+        setUniversities(uniData);
+        setCities(citiesData);
+        setCareers(careersData);
+        
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError("No se pudieron cargar todos los datos. Mostrando información limitada.");
+        
+        // Datos de respaldo en caso de error
+        setCities(["Bogotá", "Medellín", "Cali", "Barranquilla", "Cartagena"]);
+        setCareers([
+          "Ingeniería de Sistemas", "Medicina", "Derecho", "Administración de Empresas",
+          "Psicología", "Arquitectura", "Contaduría Pública", "Comunicación Social",
+          "Ingeniería Industrial", "Enfermería", "Economía", "Diseño Gráfico",
+          "Ciencias Políticas", "Biología", "Turismo", "Educación"
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
     fetchData();
   }, []);
@@ -97,28 +130,97 @@ const fetchData = async () => {
     if (type === "filter") setSelectedFilters(selectedFilters.filter(f => f !== value));
   };
 
-  const handleSearch = () => {
-    setShowResults(true);
-    setActiveFilter(null);
+  // Función auxiliar para buscar en string de carreras
+  const hasCareer = (universityCarreras, targetCareer) => {
+    if (!universityCarreras || universityCarreras === 'Carreras no disponibles') return false;
+    const carrerasArray = universityCarreras.split(',').map(c => c.trim().toLowerCase());
+    return carrerasArray.some(carrera => 
+      carrera.includes(targetCareer.toLowerCase())
+    );
+  };
+
+  const handleSearch = async () => {
+    try {
+      if (selectedCities.length > 0 || selectedCareers.length > 0) {
+        setLoading(true);
+        
+        const user = JSON.parse(sessionStorage.getItem("user"));
+        const baseUrl = 'http://localhost:5000/api/universidades/buscar';
+        
+        const params = new URLSearchParams();
+        
+        if (selectedCities.length > 0) {
+          params.append('ciudad', selectedCities[0]); // Toma la primera ciudad seleccionada
+        }
+        
+        if (selectedCareers.length > 0) {
+          params.append('carrera', selectedCareers[0]); // Toma la primera carrera seleccionada
+        }
+        
+        if (user?.id_usuario) {
+          params.append('id_usuario', user.id_usuario);
+        }
+        
+        const response = await fetch(`${baseUrl}?${params.toString()}`);
+        
+        if (response.ok) {
+          const data = await response.json();
+          setUniversities(data);
+        } else {
+          throw new Error('Error en la búsqueda');
+        }
+      }
+      
+      setShowResults(true);
+      setActiveFilter(null);
+      
+    } catch (error) {
+      console.error("Error en búsqueda:", error);
+      setError("Error al realizar la búsqueda. Mostrando todos los resultados.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const filteredUniversities = useMemo(() => {
+    if (!showResults) return [];
+    
     return universities.filter(uni => {
-      const cityMatch = selectedCities.length === 0 || selectedCities.includes(uni.city);
-      const careerMatch = selectedCareers.length === 0 ||
-                         selectedCareers.some(career => uni.careers.includes(career));
+      // Filtro por ciudad - usa 'ciudad' que viene del backend
+      const cityMatch = selectedCities.length === 0 || 
+                       selectedCities.includes(uni.ciudad);
       
-      const filterMatch = selectedFilters.length === 0;
+      // Filtro por carreras - busca en el string de carreras
+      const careerMatch = selectedCareers.length === 0 ||
+                         selectedCareers.some(career => 
+                           hasCareer(uni.carreras, career)
+                         );
+      
+      // Filtros adicionales básicos
+      const filterMatch = selectedFilters.length === 0 || 
+                         selectedFilters.every(filter => {
+                           switch(filter) {
+                             case "Becas o financiamiento":
+                               return uni.costo !== null && uni.costo < 10000000;
+                             case "Ranking / Puntaje":
+                               return uni.likes_count > 5;
+                             case "Internacionalización":
+                               return uni.acreditacion === 'Acreditada';
+                             default:
+                               return true;
+                           }
+                         });
       
       return cityMatch && careerMatch && filterMatch;
     });
-  }, [selectedCities, selectedCareers, selectedFilters, universities]);
+  }, [selectedCities, selectedCareers, selectedFilters, universities, showResults]);
 
   if (loading) {
     return (
       <div className="app">
         <Header />
         <div className="loading">
+          <div className="spinner"></div>
           <p>Cargando universidades...</p>
         </div>
         <Footer />
@@ -131,6 +233,13 @@ const fetchData = async () => {
       <Header />
 
       <main className="main">
+        {error && (
+          <div className="error-banner">
+            <span>{error}</span>
+            <button onClick={() => setError(null)}>×</button>
+          </div>
+        )}
+
         <section className="hero">
           <div className="hero__container">
             <div className="hero__content">
@@ -295,5 +404,5 @@ const fetchData = async () => {
     </div>
   );
 }
-//s
+
 export default Inicio;
