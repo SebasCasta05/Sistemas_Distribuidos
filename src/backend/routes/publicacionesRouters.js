@@ -81,7 +81,7 @@ router.post("/viviendas", async (req, res) => {
          RETURNING id_publicacion`,
         [id_usuario, "vivienda", nombre, descripcion]
       );
-
+//s
       const id_publicacion = publicacionResult.rows[0].id_publicacion;
 
       const viviendaResult = await client.query(

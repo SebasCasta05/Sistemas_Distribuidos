@@ -1,6 +1,6 @@
 import pool from "../config/db.js";
 
-// Función auxiliar para procesar universidades con el nuevo formato
+// Función auxiliar para procesar universidades con el nuevo formatos
 const procesarUniversidades = (rows) => {
   return rows.map(uni => ({
     ...uni,

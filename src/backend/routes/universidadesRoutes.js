@@ -27,5 +27,5 @@ router.get("/favoritas/:id_usuario", getFavoritas);
 router.post("/like/check", checkIfLiked);
 
 router.post("/like/toggle", toggleLike);
-
+//s
 export default router;

@@ -209,6 +209,7 @@ function UniversityCard({ university = {} }) {
       </div>
     </div>
   );
+  //s
 }
 
 export default UniversityCard;
