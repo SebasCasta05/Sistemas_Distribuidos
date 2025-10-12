@@ -5,12 +5,10 @@ import "../componentesCss/universityCard.css";
 function UniversityCard({ university = {} }) {
   const [liked, setLiked] = useState(university.liked || false);
 
-  // DEBUG: Ver qué datos llegan
   useEffect(() => {
     console.log("Datos de universidad recibidos:", university);
   }, [university]);
 
-  // Verificar like al cargar el componente
   useEffect(() => {
     const checkLikeStatus = async () => {
       const user = JSON.parse(sessionStorage.getItem("user"));
@@ -71,7 +69,6 @@ function UniversityCard({ university = {} }) {
     }
   };
 
-  // Formatear costo como moneda
   const formatCurrency = (amount) => {
     if (!amount || amount === 0) return "Consulta directamente";
     return new Intl.NumberFormat('es-CO', {
@@ -81,7 +78,35 @@ function UniversityCard({ university = {} }) {
     }).format(amount);
   };
 
-  // Si no hay datos de universidad, mostrar placeholder
+  // Función para mostrar el rango de costos semestrales
+  const renderCostoSemestral = () => {
+    if (!university.costo_semestral) {
+      return "Consulta directamente";
+    }
+
+    const { minimo, maximo, tiene_rango } = university.costo_semestral;
+
+    if (tiene_rango) {
+      return (
+        <div className="costo-rango">
+          <div className="costo-valores">
+            {formatCurrency(minimo)} - {formatCurrency(maximo)}
+          </div>
+          <small className="costo-leyenda">por semestre</small>
+        </div>
+      );
+    } else {
+      return (
+        <div className="costo-rango">
+          <div className="costo-valores">
+            {formatCurrency(minimo)}
+          </div>
+          <small className="costo-leyenda">por semestre</small>
+        </div>
+      );
+    }
+  };
+
   if (!university || Object.keys(university).length === 0) {
     return (
       <div className="university-card">
@@ -121,25 +146,23 @@ function UniversityCard({ university = {} }) {
         </p>
 
         <div className="university-card__details">
-          {/* Ciudad */}
           <div className="university-card__detail">
             <MapPin size={16} />
             <span>{university.ciudad || "Ciudad no especificada"}</span>
           </div>
 
-          {/* Acreditación */}
           <div className="university-card__detail">
             <Award size={16} />
             <span>{university.acreditacion || "Acreditación no especificada"}</span>
           </div>
 
-          {/* Costo */}
           <div className="university-card__detail">
             <DollarSign size={16} />
-            <span>{formatCurrency(university.costo)}</span>
+            <span className="university-card__costo">
+              {renderCostoSemestral()}
+            </span>
           </div>
 
-          {/* Carreras */}
           {university.carreras && university.carreras !== 'Carreras no disponibles' && (
             <div className="university-card__detail">
               <GraduationCap size={16} />
@@ -154,7 +177,6 @@ function UniversityCard({ university = {} }) {
             </div>
           )}
 
-          {/* Likes count */}
           <div className="university-card__detail">
             <Heart size={16} />
             <span>{university.likes_count || 0} likes</span>
@@ -187,6 +209,7 @@ function UniversityCard({ university = {} }) {
       </div>
     </div>
   );
+  //s
 }
 
 export default UniversityCard;
