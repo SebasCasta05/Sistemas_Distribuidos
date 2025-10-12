@@ -4,6 +4,7 @@ import Login from "./interfaces/Login.jsx";
 import Register from "./interfaces/Register.jsx";
 import Perfil from "./interfaces/Perfil.jsx";
 import Muro from "./interfaces/muro.jsx";
+import Hilos from "./interfaces/Hilos.jsx";
 
 function App() {
   return (
@@ -14,9 +15,10 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/perfil" element={<Perfil />} />
         <Route path="/muro" element={<Muro />} />
+        <Route path="/hilos" element={<Hilos />} />
       </Routes>
     </Router>
   );
 }
-//ss
+
 export default App;
