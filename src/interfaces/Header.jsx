@@ -35,6 +35,12 @@ function Header() {
         >
           <span role="img" aria-label="wall">🧱</span> Muro
         </a>
+        <a href="#"
+          className="header__link"
+          onClick={(e) => { e.preventDefault(); navigate("/hilos"); }}
+        >
+          <span role="img" aria-label="threads">💬</span> Hilo
+        </a>
       </nav>
 
       <div className="header__right">
