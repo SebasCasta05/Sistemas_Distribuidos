@@ -23,7 +23,6 @@ html, body {
   overflow-x: hidden;
 }
 
-/* ===== HEADER Y FOOTER ===== */
 .header {
   background: #2196f3;
   color: white;
@@ -83,7 +82,6 @@ html, body {
   margin-top: auto;
 }
 
-/* ===== FORMULARIOS DE EDICIÓN ===== */
 .edit-form {
   display: flex;
   flex-direction: column;
@@ -194,7 +192,6 @@ html, body {
   transform: translateY(-2px);
 }
 
-/* ===== PERFIL CONTAINER ===== */
 .perfil-container {
   max-width: 100%;
   margin: 0;
@@ -1259,4 +1256,20 @@ html {
 .cover-edit-btn {
   z-index: 10;
   position: relative;
+}
+
+
+.favoritas-section {
+  margin-top: 3rem;
+  padding: 1rem;
+}
+
+.favoritas-section h2 {
+  color: #1e3a8a;
+}
+
+.favoritas-section .grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
 }

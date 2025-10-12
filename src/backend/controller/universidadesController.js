@@ -1,9 +1,25 @@
 import pool from "../config/db.js";
 
-// 📌 Obtener todas las universidades con información completa
+// Función auxiliar para procesar universidades con el nuevo formatos
+const procesarUniversidades = (rows) => {
+  return rows.map(uni => ({
+    ...uni,
+    carreras: uni.carreras || 'Carreras no disponibles',
+    // Nuevo formato de costo semestral como rango
+    costo_semestral: uni.costo_semestral_minimo && uni.costo_semestral_maximo ? {
+      minimo: Math.round(uni.costo_semestral_minimo),
+      maximo: Math.round(uni.costo_semestral_maximo),
+      tiene_rango: uni.costo_semestral_minimo !== uni.costo_semestral_maximo
+    } : null,
+    total_carreras: uni.total_carreras || 0,
+    descripcion: uni.descripcion || 'Sin descripción disponible.',
+    imagen: uni.imagen || '/placeholder-university.jpg'
+  }));
+};
+
 export const getUniversidades = async (req, res) => {
   try {
-    const { id_usuario } = req.query; // Opcional: para saber si el usuario ya dio like
+    const { id_usuario } = req.query;
 
     let query = `
       SELECT 
@@ -13,7 +29,7 @@ export const getUniversidades = async (req, res) => {
         u.imagen_url AS imagen,
         u.enlace_oficial AS link,
         c.nombreciudad AS ciudad,
-        -- Campos adicionales para las tarjetas
+        -- Carreras principales
         (
           SELECT STRING_AGG(DISTINCT ca.nombrecarrera, ', ')
           FROM carrera ca
@@ -22,13 +38,31 @@ export const getUniversidades = async (req, res) => {
           AND ca.estadoprograma = 'Activo'
           LIMIT 3
         ) AS carreras,
+        -- Rango de costos SEMESTRALES (mínimo y máximo)
         (
-          SELECT AVG(ca.preciocredito) * 160 -- Costo estimado por semestre (16 créditos promedio)
+          SELECT MIN(ca.preciocredito * 16) -- Costo semestral MÍNIMO
           FROM carrera ca
           JOIN sede s ON s.idsede = ca.idsede
           WHERE s.iduniversidad = u.iduniversidad
           AND ca.preciocredito IS NOT NULL
-        ) AS costo,
+          AND ca.estadoprograma = 'Activo'
+        ) AS costo_semestral_minimo,
+        (
+          SELECT MAX(ca.preciocredito * 16) -- Costo semestral MÁXIMO
+          FROM carrera ca
+          JOIN sede s ON s.idsede = ca.idsede
+          WHERE s.iduniversidad = u.iduniversidad
+          AND ca.preciocredito IS NOT NULL
+          AND ca.estadoprograma = 'Activo'
+        ) AS costo_semestral_maximo,
+        -- Número de carreras disponibles
+        (
+          SELECT COUNT(DISTINCT ca.idcarrera)
+          FROM carrera ca
+          JOIN sede s ON s.idsede = ca.idsede
+          WHERE s.iduniversidad = u.iduniversidad
+          AND ca.estadoprograma = 'Activo'
+        ) AS total_carreras,
         CASE 
           WHEN u.reconocimientoministerio = true THEN 'Acreditada'
           ELSE 'En proceso'
@@ -48,16 +82,7 @@ export const getUniversidades = async (req, res) => {
     const params = id_usuario ? [id_usuario] : [];
     const result = await pool.query(query, params);
     
-    // Procesar los datos para asegurar que tengan valores por defecto
-    const universidadesProcesadas = result.rows.map(uni => ({
-      ...uni,
-      carreras: uni.carreras || 'Carreras no disponibles',
-      costo: uni.costo ? Math.round(uni.costo) : null,
-      acreditacion: uni.acreditacion || 'No especificada',
-      descripcion: uni.descripcion || 'Sin descripción disponible.',
-      imagen: uni.imagen || '/placeholder-university.jpg'
-    }));
-    
+    const universidadesProcesadas = procesarUniversidades(result.rows);
     res.json(universidadesProcesadas);
   } catch (error) {
     console.error("❌ Error al obtener universidades:", error);
@@ -65,7 +90,6 @@ export const getUniversidades = async (req, res) => {
   }
 };
 
-// 📌 Obtener todas las ciudades donde hay universidades
 export const getCiudades = async (req, res) => {
   try {
     const result = await pool.query(`
@@ -81,7 +105,6 @@ export const getCiudades = async (req, res) => {
   }
 };
 
-// 📌 Obtener todas las carreras disponibles
 export const getCarreras = async (req, res) => {
   try {
     const result = await pool.query(`
@@ -97,7 +120,6 @@ export const getCarreras = async (req, res) => {
   }
 };
 
-// 📌 Buscar universidades con filtros
 export const buscarUniversidades = async (req, res) => {
   try {
     const { ciudad, carrera, acreditacion, id_usuario } = req.query;
@@ -118,13 +140,30 @@ export const buscarUniversidades = async (req, res) => {
           AND ca.estadoprograma = 'Activo'
           LIMIT 3
         ) AS carreras,
+        -- Rango de costos SEMESTRALES para búsqueda también
         (
-          SELECT AVG(ca.preciocredito) * 160
+          SELECT MIN(ca.preciocredito * 16)
           FROM carrera ca
           JOIN sede s ON s.idsede = ca.idsede
           WHERE s.iduniversidad = u.iduniversidad
           AND ca.preciocredito IS NOT NULL
-        ) AS costo,
+          AND ca.estadoprograma = 'Activo'
+        ) AS costo_semestral_minimo,
+        (
+          SELECT MAX(ca.preciocredito * 16)
+          FROM carrera ca
+          JOIN sede s ON s.idsede = ca.idsede
+          WHERE s.iduniversidad = u.iduniversidad
+          AND ca.preciocredito IS NOT NULL
+          AND ca.estadoprograma = 'Activo'
+        ) AS costo_semestral_maximo,
+        (
+          SELECT COUNT(DISTINCT ca.idcarrera)
+          FROM carrera ca
+          JOIN sede s ON s.idsede = ca.idsede
+          WHERE s.iduniversidad = u.iduniversidad
+          AND ca.estadoprograma = 'Activo'
+        ) AS total_carreras,
         CASE 
           WHEN u.reconocimientoministerio = true THEN 'Acreditada'
           ELSE 'En proceso'
@@ -164,22 +203,12 @@ export const buscarUniversidades = async (req, res) => {
 
     query += ` ORDER BY u.nombreuniversidad`;
 
-    // Si hay usuario autenticado, agregar al inicio de los parámetros
     if (id_usuario) {
       params.unshift(id_usuario);
     }
 
     const result = await pool.query(query, params);
-    
-    const universidadesProcesadas = result.rows.map(uni => ({
-      ...uni,
-      carreras: uni.carreras || 'Carreras no disponibles',
-      costo: uni.costo ? Math.round(uni.costo) : null,
-      acreditacion: uni.acreditacion || 'No especificada',
-      descripcion: uni.descripcion || 'Sin descripción disponible.',
-      imagen: uni.imagen || '/placeholder-university.jpg'
-    }));
-    
+    const universidadesProcesadas = procesarUniversidades(result.rows);
     res.json(universidadesProcesadas);
   } catch (error) {
     console.error("❌ Error al buscar universidades:", error);
@@ -187,102 +216,6 @@ export const buscarUniversidades = async (req, res) => {
   }
 };
 
-// 📌 Verificar si una universidad está en likes de un usuario
-export const checkIfLiked = async (req, res) => {
-  const { id_usuario, id_universidad } = req.body;
-
-  if (!id_usuario || !id_universidad) {
-    return res.status(400).json({ message: "Faltan datos." });
-  }
-
-  try {
-    const result = await pool.query(
-      "SELECT * FROM likes WHERE id_usuario = $1 AND id_universidad = $2",
-      [id_usuario, id_universidad]
-    );
-    res.json({ liked: result.rows.length > 0 });
-  } catch (error) {
-    console.error("❌ Error al verificar likes:", error);
-    res.status(500).json({ message: "Error interno del servidor" });
-  }
-};
-
-// 📌 Alternar like (agregar o eliminar)
-export const toggleLike = async (req, res) => {
-  const { id_usuario, id_universidad } = req.body;
-
-  if (!id_usuario || !id_universidad) {
-    return res.status(401).json({ message: "No autorizado. Inicia sesión primero." });
-  }
-
-  try {
-    // Verificar si el usuario existe
-    const userCheck = await pool.query(
-      "SELECT id_usuario FROM usuario WHERE id_usuario = $1",
-      [id_usuario]
-    );
-
-    if (userCheck.rows.length === 0) {
-      return res.status(404).json({ message: "Usuario no encontrado." });
-    }
-
-    // Verificar si la universidad existe
-    const uniCheck = await pool.query(
-      "SELECT iduniversidad FROM universidad WHERE iduniversidad = $1",
-      [id_universidad]
-    );
-
-    if (uniCheck.rows.length === 0) {
-      return res.status(404).json({ message: "Universidad no encontrada." });
-    }
-
-    const check = await pool.query(
-      "SELECT * FROM likes WHERE id_usuario = $1 AND id_universidad = $2",
-      [id_usuario, id_universidad]
-    );
-
-    if (check.rows.length > 0) {
-      // Eliminar like
-      await pool.query(
-        "DELETE FROM likes WHERE id_usuario = $1 AND id_universidad = $2",
-        [id_usuario, id_universidad]
-      );
-      
-      // Actualizar contador en universidad
-      await pool.query(
-        "UPDATE universidad SET likes_count = GREATEST(0, COALESCE(likes_count, 0) - 1) WHERE iduniversidad = $1",
-        [id_universidad]
-      );
-      
-      return res.json({ liked: false, message: "❌ Like eliminado." });
-    } else {
-      // Agregar like
-      await pool.query(
-        "INSERT INTO likes (id_usuario, id_universidad) VALUES ($1, $2)",
-        [id_usuario, id_universidad]
-      );
-      
-      // Actualizar contador en universidad
-      await pool.query(
-        "UPDATE universidad SET likes_count = COALESCE(likes_count, 0) + 1 WHERE iduniversidad = $1",
-        [id_universidad]
-      );
-      
-      return res.json({ liked: true, message: "❤️ Like agregado." });
-    }
-  } catch (error) {
-    console.error("❌ Error al alternar like:", error);
-    
-    // Si es error de duplicado
-    if (error.code === '23505') {
-      return res.status(400).json({ message: "Ya has dado like a esta universidad." });
-    }
-    
-    res.status(500).json({ message: "Error interno del servidor" });
-  }
-};
-
-// 📌 Obtener universidades favoritas de un usuario
 export const getFavoritas = async (req, res) => {
   const { id_usuario } = req.params;
 
@@ -307,13 +240,30 @@ export const getFavoritas = async (req, res) => {
           AND ca.estadoprograma = 'Activo'
           LIMIT 3
         ) AS carreras,
+        -- Rango de costos SEMESTRALES para favoritas también
         (
-          SELECT AVG(ca.preciocredito) * 160
+          SELECT MIN(ca.preciocredito * 16)
           FROM carrera ca
           JOIN sede s ON s.idsede = ca.idsede
           WHERE s.iduniversidad = u.iduniversidad
           AND ca.preciocredito IS NOT NULL
-        ) AS costo,
+          AND ca.estadoprograma = 'Activo'
+        ) AS costo_semestral_minimo,
+        (
+          SELECT MAX(ca.preciocredito * 16)
+          FROM carrera ca
+          JOIN sede s ON s.idsede = ca.idsede
+          WHERE s.iduniversidad = u.iduniversidad
+          AND ca.preciocredito IS NOT NULL
+          AND ca.estadoprograma = 'Activo'
+        ) AS costo_semestral_maximo,
+        (
+          SELECT COUNT(DISTINCT ca.idcarrera)
+          FROM carrera ca
+          JOIN sede s ON s.idsede = ca.idsede
+          WHERE s.iduniversidad = u.iduniversidad
+          AND ca.estadoprograma = 'Activo'
+        ) AS total_carreras,
         CASE 
           WHEN u.reconocimientoministerio = true THEN 'Acreditada'
           ELSE 'En proceso'
@@ -328,16 +278,7 @@ export const getFavoritas = async (req, res) => {
     `;
 
     const result = await pool.query(query, [id_usuario]);
-    
-    const universidadesProcesadas = result.rows.map(uni => ({
-      ...uni,
-      carreras: uni.carreras || 'Carreras no disponibles',
-      costo: uni.costo ? Math.round(uni.costo) : null,
-      acreditacion: uni.acreditacion || 'No especificada',
-      descripcion: uni.descripcion || 'Sin descripción disponible.',
-      imagen: uni.imagen || '/placeholder-university.jpg'
-    }));
-    
+    const universidadesProcesadas = procesarUniversidades(result.rows);
     res.json(universidadesProcesadas);
   } catch (error) {
     console.error("❌ Error al obtener favoritas:", error);
@@ -345,7 +286,93 @@ export const getFavoritas = async (req, res) => {
   }
 };
 
-// 📌 Obtener detalles completos de una universidad
+// Los demás métodos (checkIfLiked, toggleLike, getUniversidadById) se mantienen igual
+export const checkIfLiked = async (req, res) => {
+  const { id_usuario, id_universidad } = req.body;
+
+  if (!id_usuario || !id_universidad) {
+    return res.status(400).json({ message: "Faltan datos." });
+  }
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM likes WHERE id_usuario = $1 AND id_universidad = $2",
+      [id_usuario, id_universidad]
+    );
+    res.json({ liked: result.rows.length > 0 });
+  } catch (error) {
+    console.error("❌ Error al verificar likes:", error);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
+export const toggleLike = async (req, res) => {
+  const { id_usuario, id_universidad } = req.body;
+
+  if (!id_usuario || !id_universidad) {
+    return res.status(401).json({ message: "No autorizado. Inicia sesión primero." });
+  }
+
+  try {
+    const userCheck = await pool.query(
+      "SELECT id_usuario FROM usuario WHERE id_usuario = $1",
+      [id_usuario]
+    );
+
+    if (userCheck.rows.length === 0) {
+      return res.status(404).json({ message: "Usuario no encontrado." });
+    }
+
+    const uniCheck = await pool.query(
+      "SELECT iduniversidad FROM universidad WHERE iduniversidad = $1",
+      [id_universidad]
+    );
+
+    if (uniCheck.rows.length === 0) {
+      return res.status(404).json({ message: "Universidad no encontrada." });
+    }
+
+    const check = await pool.query(
+      "SELECT * FROM likes WHERE id_usuario = $1 AND id_universidad = $2",
+      [id_usuario, id_universidad]
+    );
+
+    if (check.rows.length > 0) {
+      await pool.query(
+        "DELETE FROM likes WHERE id_usuario = $1 AND id_universidad = $2",
+        [id_usuario, id_universidad]
+      );
+      
+      await pool.query(
+        "UPDATE universidad SET likes_count = GREATEST(0, COALESCE(likes_count, 0) - 1) WHERE iduniversidad = $1",
+        [id_universidad]
+      );
+      
+      return res.json({ liked: false, message: "❌ Like eliminado." });
+    } else {
+      await pool.query(
+        "INSERT INTO likes (id_usuario, id_universidad) VALUES ($1, $2)",
+        [id_usuario, id_universidad]
+      );
+      
+      await pool.query(
+        "UPDATE universidad SET likes_count = COALESCE(likes_count, 0) + 1 WHERE iduniversidad = $1",
+        [id_universidad]
+      );
+      
+      return res.json({ liked: true, message: "❤️ Like agregado." });
+    }
+  } catch (error) {
+    console.error("❌ Error al alternar like:", error);
+    
+    if (error.code === '23505') {
+      return res.status(400).json({ message: "Ya has dado like a esta universidad." });
+    }
+    
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
 export const getUniversidadById = async (req, res) => {
   const { id } = req.params;
   const { id_usuario } = req.query;

@@ -1,0 +1,70 @@
+[33m5219a4b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{0}: reset: moving to HEAD~5
+[33m5eaabca[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{1}: pull --ff --recurse-submodules --progress origin: Fast-forward
+[33mc14cde9[m HEAD@{2}: commit: Comentarios
+[33m3b81f4a[m HEAD@{3}: commit: U Favs Perfil.jsx
+[33m55c7b9d[m HEAD@{4}: pull --ff --recurse-submodules --progress origin: Merge made by the 'ort' strategy.
+[33m5219a4b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{5}: commit: Rangos de semestre
+[33m7b8106f[m HEAD@{6}: commit: Filtro Carreras y Ciudades
+[33mcf247f4[m HEAD@{7}: pull --ff --recurse-submodules --progress origin: Fast-forward
+[33m2fad059[m HEAD@{8}: pull --ff --recurse-submodules --progress origin: Fast-forward
+[33ma8b3529[m HEAD@{9}: commit: likes
+[33m71fdeb8[m HEAD@{10}: pull --tags origin main: Fast-forward
+[33m1fe0f6a[m HEAD@{11}: commit: comentariossssss
+[33m5479270[m HEAD@{12}: commit: comentarios
+[33m92527ec[m HEAD@{13}: pull --tags origin main: Fast-forward
+[33m96f903d[m HEAD@{14}: pull --ff --recurse-submodules --progress origin: Merge made by the 'ort' strategy.
+[33md033bb3[m HEAD@{15}: commit: Imagenes
+[33me68ed80[m HEAD@{16}: commit: Universidades
+[33mb0e70e0[m HEAD@{17}: pull --ff --recurse-submodules --progress origin: Fast-forward
+[33mdb951f6[m HEAD@{18}: commit: agregado TipoUsuario a la BD
+[33mee9220e[m HEAD@{19}: pull --ff --recurse-submodules --progress origin: Fast-forward
+[33m81548d7[m HEAD@{20}: pull --tags origin main: Fast-forward
+[33m82eaa1b[m HEAD@{21}: commit: borrado Router
+[33m6757ee2[m HEAD@{22}: pull --ff --recurse-submodules --progress origin: Merge made by the 'ort' strategy.
+[33mfdf7be3[m HEAD@{23}: commit: Muroooo
+[33maf51725[m HEAD@{24}: commit: Separar Inicio
+[33m18eb333[m HEAD@{25}: pull --ff --recurse-submodules --progress origin: Fast-forward
+[33m6ecc1b9[m HEAD@{26}: pull --ff --recurse-submodules --progress origin: Fast-forward
+[33maf1e76d[m HEAD@{27}: pull --tags origin main: Fast-forward
+[33m4cf05ab[m HEAD@{28}: commit: Header Perfil
+[33m796b6f8[m HEAD@{29}: commit: Quitar cosas Perfil.jsx
+[33m409c3cb[m HEAD@{30}: pull --ff --recurse-submodules --progress origin: Fast-forward
+[33mf04456e[m HEAD@{31}: commit: EditarPerfil
+[33m5ef7e71[m HEAD@{32}: commit: Header Login-CerrarSesion
+[33m571d430[m HEAD@{33}: pull --ff --recurse-submodules --progress origin: Fast-forward
+[33m87f70a3[m HEAD@{34}: commit: mostrarDatos
+[33mb2c62b7[m HEAD@{35}: pull --ff --recurse-submodules --progress origin: Fast-forward
+[33me206945[m HEAD@{36}: commit: Base de datos
+[33m24103d7[m HEAD@{37}: commit: Register- telefono
+[33m1f5cb17[m HEAD@{38}: commit: Registro- agrego apellido direccion
+[33mac3fac6[m HEAD@{39}: pull --ff --recurse-submodules --progress origin: Fast-forward
+[33m7f01284[m HEAD@{40}: pull --ff --recurse-submodules --progress origin: Fast-forward
+[33mdf858af[m HEAD@{41}: commit: Perfil
+[33mbcb6b47[m HEAD@{42}: commit: espacio en comentario
+[33m9e52f17[m HEAD@{43}: commit: n
+[33m03c0932[m HEAD@{44}: commit: e
+[33m3e3a876[m HEAD@{45}: commit: Register
+[33m18ded94[m HEAD@{46}: pull --ff --recurse-submodules --progress origin: Merge made by the 'ort' strategy.
+[33m78b3ca7[m HEAD@{47}: commit: Login
+[33m5ca7d9f[m HEAD@{48}: pull --ff --recurse-submodules --progress origin: Fast-forward
+[33m454d7a0[m HEAD@{49}: pull --ff --recurse-submodules --progress origin: Fast-forward
+[33mdaaf428[m HEAD@{50}: pull --ff --recurse-submodules --progress origin: Fast-forward
+[33md28ec8b[m HEAD@{51}: pull --ff --recurse-submodules --progress origin: Fast-forward
+[33mdb003e5[m HEAD@{52}: commit: ya muestra
+[33ma1986d9[m HEAD@{53}: pull --ff --recurse-submodules --progress origin: Fast-forward
+[33m6642731[m HEAD@{54}: commit: import inicio
+[33md874488[m HEAD@{55}: pull --ff --recurse-submodules --progress origin: Fast-forward
+[33m1007d29[m HEAD@{56}: commit: inicio.css
+[33mc4a0b4e[m HEAD@{57}: commit: borar todosss
+[33md0c2b2b[m HEAD@{58}: commit: Borrar todoo
+[33m4ff2a6f[m HEAD@{59}: pull --ff --recurse-submodules --progress origin: Fast-forward
+[33m6661144[m HEAD@{60}: commit: sss
+[33mbc809c7[m HEAD@{61}: commit: sss
+[33m0d84f87[m HEAD@{62}: commit: ahora
+[33m2443fcc[m HEAD@{63}: pull --tags origin main: Fast-forward
+[33m4592caa[m HEAD@{64}: commit: eqrwe
+[33m1be39b9[m HEAD@{65}: pull --ff --recurse-submodules --progress origin: Fast-forward
+[33m49c9ef1[m HEAD@{66}: Branch: renamed refs/heads/main to refs/heads/main
+[33m49c9ef1[m HEAD@{68}: Branch: renamed refs/heads/commit to refs/heads/main
+[33m49c9ef1[m HEAD@{70}: Branch: renamed refs/heads/master to refs/heads/commit
+[33m49c9ef1[m HEAD@{72}: commit (initial): primer commit

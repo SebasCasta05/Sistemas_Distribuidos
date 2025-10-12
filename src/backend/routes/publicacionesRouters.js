@@ -3,9 +3,6 @@ import pool from "../config/db.js";
 
 const router = express.Router();
 
-//RUTAS PARA VIVIENDAS
-
-//mostrar publicaciones de viviendass
 router.get("/viviendas", async (req, res) => {
   try {
     const result = await pool.query(
@@ -30,7 +27,6 @@ router.get("/viviendas", async (req, res) => {
   }
 });
 
-// Obtener una publicación de vivienda por ID
 router.get("/viviendas/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -62,7 +58,6 @@ router.get("/viviendas/:id", async (req, res) => {
   }
 });
 
-// Crear una nueva publicación de vivienda
 router.post("/viviendas", async (req, res) => {
   try {
     const { nombre, precio, ciudad, ubicacion, telefono, img, descripcion, id_usuario } = req.body;
@@ -86,7 +81,7 @@ router.post("/viviendas", async (req, res) => {
          RETURNING id_publicacion`,
         [id_usuario, "vivienda", nombre, descripcion]
       );
-
+//s
       const id_publicacion = publicacionResult.rows[0].id_publicacion;
 
       const viviendaResult = await client.query(
@@ -97,7 +92,6 @@ router.post("/viviendas", async (req, res) => {
         [id_publicacion, precio, ciudad, ubicacion, telefono, img || ""]
       );
 
-      // Obtener todos los datos completos para devolverlos al frontend
       const fullResult = await client.query(
         `SELECT 
           pv.*, 
@@ -129,9 +123,6 @@ router.post("/viviendas", async (req, res) => {
   }
 });
 
-  //RUTAS PARA EMPLEOS
-
-// Obtener todas las publicaciones de empleo
 router.get("/empleos", async (req, res) => {
   try {
     const result = await pool.query(
@@ -156,7 +147,6 @@ router.get("/empleos", async (req, res) => {
   }
 });
 
-// Obtener una publicación de empleo por ID
 router.get("/empleos/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -188,7 +178,6 @@ router.get("/empleos/:id", async (req, res) => {
   }
 });
 
-// Crear una nueva publicación de empleo
 router.post("/empleos", async (req, res) => {
   try {
     const {
@@ -233,7 +222,6 @@ router.post("/empleos", async (req, res) => {
         [id_publicacion, salario, empresa, modalidad, telefono, habilidades_minimas || "", estudios || ""]
       );
 
-      // Obtener todos los datos completos para devolverlos al frontend
       const fullResult = await client.query(
         `SELECT 
           pe.*, 
@@ -264,8 +252,6 @@ router.post("/empleos", async (req, res) => {
     res.status(500).json({ error: "Error al crear empleo" });
   }
 });
-
-  //PUBLICACIONES DE UN USUARIO
 
 router.get("/usuario/:id_usuario", async (req, res) => {
   const { id_usuario } = req.params;
@@ -300,7 +286,6 @@ router.get("/usuario/:id_usuario", async (req, res) => {
   }
 });
 
-  //ELIMINAR PUBLICACIÓN
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
 
