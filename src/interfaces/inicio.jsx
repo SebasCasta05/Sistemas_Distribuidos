@@ -20,9 +20,14 @@ function Inicio() {
   const [error, setError] = useState(null);
 
   const additionalFilters = [
-    "Ranking / Puntaje", "Semilleros de investigación", "Duración del programa",
-    "Horario (Diurno / Nocturno / FDS)", "Modalidad de titulación", "Becas o financiamiento",
-    "Internacionalización", "Oferta de posgrados", "Infraestructura"
+    "Acreditada",
+    "Con Reconocimiento del Ministerio",
+    "Universidad Pública",
+    "Universidad Privada",
+    "Ranking Top 10",
+    "Ranking Top 20",
+    "Con Posgrados",
+    "Solo Pregrado"
   ];
 
   // Cargar datos reales desde el backend
@@ -42,8 +47,8 @@ function Inicio() {
         
         const [uniResponse, citiesResponse, careersResponse] = await Promise.all([
           fetch(uniUrl),
-          fetch(`${baseUrl}/ciudades`),  // URL corregida
-          fetch(`${baseUrl}/carreras`)   // URL corregida
+          fetch(`${baseUrl}/ciudades`),
+          fetch(`${baseUrl}/carreras`)
         ]);
 
         // Verificar respuestas
@@ -150,16 +155,21 @@ function Inicio() {
         const params = new URLSearchParams();
         
         if (selectedCities.length > 0) {
-          params.append('ciudad', selectedCities[0]); // Toma la primera ciudad seleccionada
+          params.append('ciudad', selectedCities[0]);
         }
         
         if (selectedCareers.length > 0) {
-          params.append('carrera', selectedCareers[0]); // Toma la primera carrera seleccionada
+          params.append('carrera', selectedCareers[0]);
         }
         
         if (user?.id_usuario) {
           params.append('id_usuario', user.id_usuario);
         }
+        
+        // Agregar filtros adicionales a la búsqueda
+        selectedFilters.forEach(filter => {
+          params.append('filtros', filter);
+        });
         
         const response = await fetch(`${baseUrl}?${params.toString()}`);
         
@@ -185,27 +195,37 @@ function Inicio() {
   const filteredUniversities = useMemo(() => {
     if (!showResults) return [];
     
-    return universities.filter(uni => {
-      // Filtro por ciudad - usa 'ciudad' que viene del backend
+    let filtered = universities.filter(uni => {
+      // Filtro por ciudad
       const cityMatch = selectedCities.length === 0 || 
                        selectedCities.includes(uni.ciudad);
       
-      // Filtro por carreras - busca en el string de carreras
+      // Filtro por carreras
       const careerMatch = selectedCareers.length === 0 ||
                          selectedCareers.some(career => 
                            hasCareer(uni.carreras, career)
                          );
       
-      // Filtros adicionales básicos
+      // Filtros adicionales - TODOS los filtros seleccionados DEBEN cumplirse (AND)
       const filterMatch = selectedFilters.length === 0 || 
                          selectedFilters.every(filter => {
                            switch(filter) {
-                             case "Becas o financiamiento":
-                               return uni.costo !== null && uni.costo < 10000000;
-                             case "Ranking / Puntaje":
-                               return uni.likes_count > 5;
-                             case "Internacionalización":
-                               return uni.acreditacion === 'Acreditada';
+                             case "Acreditada":
+                               return uni.acreditacion && uni.acreditacion.toLowerCase().includes('acreditada');
+                             case "Con Reconocimiento del Ministerio":
+                               return uni.reconocimientoministerio === true || uni.reconocimientoministerio === 1;
+                             case "Universidad Pública":
+                               return uni.id_tipo === 2;
+                             case "Universidad Privada":
+                               return uni.id_tipo === 1;
+                             case "Ranking Top 10":
+                               return uni.ranking_nacional && uni.ranking_nacional <= 10;
+                             case "Ranking Top 20":
+                               return uni.ranking_nacional && uni.ranking_nacional <= 20;
+                             case "Con Posgrados":
+                               return uni.tiene_posgrados === true;
+                             case "Solo Pregrado":
+                               return uni.tiene_posgrados === false;
                              default:
                                return true;
                            }
@@ -213,6 +233,18 @@ function Inicio() {
       
       return cityMatch && careerMatch && filterMatch;
     });
+
+    // Ordenar resultados
+    filtered.sort((a, b) => {
+      // Primero por ranking nacional
+      if (a.ranking_nacional !== b.ranking_nacional) {
+        return a.ranking_nacional - b.ranking_nacional;
+      }
+      // Luego por nombre alfabético
+      return a.nombre.localeCompare(b.nombre);
+    });
+
+    return filtered;
   }, [selectedCities, selectedCareers, selectedFilters, universities, showResults]);
 
   if (loading) {
@@ -373,17 +405,6 @@ function Inicio() {
                   </p>
                 </div>
 
-                {filteredUniversities.length > 0 && (
-                  <div className="results__sort">
-                    <span>Ordenar por:</span>
-                    <select className="sort-select">
-                      <option>Ranking</option>
-                      <option>Calificación</option>
-                      <option>Nombre</option>
-                      <option>Ciudad</option>
-                    </select>
-                  </div>
-                )}
               </div>
 
               {filteredUniversities.length === 0 ? (
@@ -404,6 +425,5 @@ function Inicio() {
     </div>
   );
 }
-//s
 
 export default Inicio;

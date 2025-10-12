@@ -1,11 +1,9 @@
 import pool from "../config/db.js";
 
-// Función auxiliar para procesar universidades con el nuevo formatos
 const procesarUniversidades = (rows) => {
   return rows.map(uni => ({
     ...uni,
     carreras: uni.carreras || 'Carreras no disponibles',
-    // Nuevo formato de costo semestral como rango
     costo_semestral: uni.costo_semestral_minimo && uni.costo_semestral_maximo ? {
       minimo: Math.round(uni.costo_semestral_minimo),
       maximo: Math.round(uni.costo_semestral_maximo),
@@ -29,7 +27,9 @@ export const getUniversidades = async (req, res) => {
         u.imagen_url AS imagen,
         u.enlace_oficial AS link,
         c.nombreciudad AS ciudad,
-        -- Carreras principales
+        u.id_tipo,
+        u.reconocimientoministerio,
+        COALESCE(r.rankingnacional, 999) AS ranking_nacional,
         (
           SELECT STRING_AGG(DISTINCT ca.nombrecarrera, ', ')
           FROM carrera ca
@@ -38,9 +38,8 @@ export const getUniversidades = async (req, res) => {
           AND ca.estadoprograma = 'Activo'
           LIMIT 3
         ) AS carreras,
-        -- Rango de costos SEMESTRALES (mínimo y máximo)
         (
-          SELECT MIN(ca.preciocredito * 16) -- Costo semestral MÍNIMO
+          SELECT MIN(ca.preciocredito * 16)
           FROM carrera ca
           JOIN sede s ON s.idsede = ca.idsede
           WHERE s.iduniversidad = u.iduniversidad
@@ -48,14 +47,13 @@ export const getUniversidades = async (req, res) => {
           AND ca.estadoprograma = 'Activo'
         ) AS costo_semestral_minimo,
         (
-          SELECT MAX(ca.preciocredito * 16) -- Costo semestral MÁXIMO
+          SELECT MAX(ca.preciocredito * 16)
           FROM carrera ca
           JOIN sede s ON s.idsede = ca.idsede
           WHERE s.iduniversidad = u.iduniversidad
           AND ca.preciocredito IS NOT NULL
           AND ca.estadoprograma = 'Activo'
         ) AS costo_semestral_maximo,
-        -- Número de carreras disponibles
         (
           SELECT COUNT(DISTINCT ca.idcarrera)
           FROM carrera ca
@@ -63,6 +61,14 @@ export const getUniversidades = async (req, res) => {
           WHERE s.iduniversidad = u.iduniversidad
           AND ca.estadoprograma = 'Activo'
         ) AS total_carreras,
+        CASE 
+          WHEN EXISTS(
+            SELECT 1 FROM posgrado_universidad pu
+            WHERE pu.iduniversidad = u.iduniversidad
+            AND pu.idnivelposgrado != 4
+          ) THEN true
+          ELSE false
+        END AS tiene_posgrados,
         CASE 
           WHEN u.reconocimientoministerio = true THEN 'Acreditada'
           ELSE 'En proceso'
@@ -76,6 +82,7 @@ export const getUniversidades = async (req, res) => {
         ` : 'false AS liked'}
       FROM universidad u
       JOIN ciudad c ON c.codigomunicipio = u.codigomunicipio
+      LEFT JOIN ranking r ON r.iduniversidad = u.iduniversidad
       ORDER BY u.nombreuniversidad;
     `;
 
@@ -122,7 +129,10 @@ export const getCarreras = async (req, res) => {
 
 export const buscarUniversidades = async (req, res) => {
   try {
-    const { ciudad, carrera, acreditacion, id_usuario } = req.query;
+    const { ciudad, carrera, id_usuario, filtros } = req.query;
+    
+    // Convertir filtros a array si es necesario
+    const filtrosArray = filtros ? (Array.isArray(filtros) ? filtros : [filtros]) : [];
     
     let query = `
       SELECT DISTINCT
@@ -132,6 +142,9 @@ export const buscarUniversidades = async (req, res) => {
         u.imagen_url AS imagen,
         u.enlace_oficial AS link,
         c.nombreciudad AS ciudad,
+        u.id_tipo,
+        u.reconocimientoministerio,
+        COALESCE(r.rankingnacional, 999) AS ranking_nacional,
         (
           SELECT STRING_AGG(DISTINCT ca.nombrecarrera, ', ')
           FROM carrera ca
@@ -140,7 +153,6 @@ export const buscarUniversidades = async (req, res) => {
           AND ca.estadoprograma = 'Activo'
           LIMIT 3
         ) AS carreras,
-        -- Rango de costos SEMESTRALES para búsqueda también
         (
           SELECT MIN(ca.preciocredito * 16)
           FROM carrera ca
@@ -165,6 +177,14 @@ export const buscarUniversidades = async (req, res) => {
           AND ca.estadoprograma = 'Activo'
         ) AS total_carreras,
         CASE 
+          WHEN EXISTS(
+            SELECT 1 FROM posgrado_universidad pu
+            WHERE pu.iduniversidad = u.iduniversidad
+            AND pu.idnivelposgrado != 4
+          ) THEN true
+          ELSE false
+        END AS tiene_posgrados,
+        CASE 
           WHEN u.reconocimientoministerio = true THEN 'Acreditada'
           ELSE 'En proceso'
         END AS acreditacion,
@@ -177,6 +197,7 @@ export const buscarUniversidades = async (req, res) => {
         ` : 'false AS liked'}
       FROM universidad u
       JOIN ciudad c ON c.codigomunicipio = u.codigomunicipio
+      LEFT JOIN ranking r ON r.iduniversidad = u.iduniversidad
       LEFT JOIN sede s ON s.iduniversidad = u.iduniversidad
       LEFT JOIN carrera ca ON ca.idsede = s.idsede
       WHERE 1=1
@@ -197,7 +218,29 @@ export const buscarUniversidades = async (req, res) => {
       params.push(carrera);
     }
 
-    if (acreditacion === 'Acreditada') {
+    // Aplicar filtros adicionales
+    if (filtrosArray.includes('Ranking Top 10')) {
+      query += ` AND r.rankingnacional <= 10`;
+    }
+    if (filtrosArray.includes('Ranking Top 20')) {
+      query += ` AND r.rankingnacional <= 20`;
+    }
+    if (filtrosArray.includes('Universidad Pública')) {
+      query += ` AND u.id_tipo = 2`;
+    }
+    if (filtrosArray.includes('Universidad Privada')) {
+      query += ` AND u.id_tipo = 1`;
+    }
+    if (filtrosArray.includes('Con Reconocimiento del Ministerio')) {
+      query += ` AND u.reconocimientoministerio = true`;
+    }
+    if (filtrosArray.includes('Con Posgrados')) {
+      query += ` AND EXISTS(SELECT 1 FROM posgrado_universidad pu WHERE pu.iduniversidad = u.iduniversidad AND pu.idnivelposgrado != 4)`;
+    }
+    if (filtrosArray.includes('Solo Pregrado')) {
+      query += ` AND NOT EXISTS(SELECT 1 FROM posgrado_universidad pu WHERE pu.iduniversidad = u.iduniversidad AND pu.idnivelposgrado != 4)`;
+    }
+    if (filtrosArray.includes('Acreditada')) {
       query += ` AND u.reconocimientoministerio = true`;
     }
 
@@ -232,6 +275,9 @@ export const getFavoritas = async (req, res) => {
         u.imagen_url AS imagen,
         u.enlace_oficial AS link,
         c.nombreciudad AS ciudad,
+        u.id_tipo,
+        u.reconocimientoministerio,
+        COALESCE(r.rankingnacional, 999) AS ranking_nacional,
         (
           SELECT STRING_AGG(DISTINCT ca.nombrecarrera, ', ')
           FROM carrera ca
@@ -240,7 +286,6 @@ export const getFavoritas = async (req, res) => {
           AND ca.estadoprograma = 'Activo'
           LIMIT 3
         ) AS carreras,
-        -- Rango de costos SEMESTRALES para favoritas también
         (
           SELECT MIN(ca.preciocredito * 16)
           FROM carrera ca
@@ -265,6 +310,14 @@ export const getFavoritas = async (req, res) => {
           AND ca.estadoprograma = 'Activo'
         ) AS total_carreras,
         CASE 
+          WHEN EXISTS(
+            SELECT 1 FROM posgrado_universidad pu
+            WHERE pu.iduniversidad = u.iduniversidad
+            AND pu.idnivelposgrado != 4
+          ) THEN true
+          ELSE false
+        END AS tiene_posgrados,
+        CASE 
           WHEN u.reconocimientoministerio = true THEN 'Acreditada'
           ELSE 'En proceso'
         END AS acreditacion,
@@ -272,6 +325,7 @@ export const getFavoritas = async (req, res) => {
         true AS liked
       FROM universidad u
       JOIN ciudad c ON c.codigomunicipio = u.codigomunicipio
+      LEFT JOIN ranking r ON r.iduniversidad = u.iduniversidad
       JOIN likes l ON l.id_universidad = u.iduniversidad
       WHERE l.id_usuario = $1
       ORDER BY u.nombreuniversidad;
@@ -286,7 +340,6 @@ export const getFavoritas = async (req, res) => {
   }
 };
 
-// Los demás métodos (checkIfLiked, toggleLike, getUniversidadById) se mantienen igual
 export const checkIfLiked = async (req, res) => {
   const { id_usuario, id_universidad } = req.body;
 
@@ -388,7 +441,9 @@ export const getUniversidadById = async (req, res) => {
         c.nombreciudad AS ciudad,
         d.nombredepartamento AS departamento,
         tu.tipo AS tipo_universidad,
+        u.id_tipo,
         u.reconocimientoministerio,
+        COALESCE(r.rankingnacional, 999) AS ranking_nacional,
         COALESCE(u.likes_count, 0) AS likes_count,
         ${id_usuario ? `
         EXISTS(
@@ -396,7 +451,14 @@ export const getUniversidadById = async (req, res) => {
           WHERE l.id_usuario = $2 AND l.id_universidad = u.iduniversidad
         ) AS liked
         ` : 'false AS liked'},
-        -- Información de carreras
+        CASE 
+          WHEN EXISTS(
+            SELECT 1 FROM posgrado_universidad pu
+            WHERE pu.iduniversidad = u.iduniversidad
+            AND pu.idnivelposgrado != 4
+          ) THEN true
+          ELSE false
+        END AS tiene_posgrados,
         (
           SELECT JSON_AGG(
             JSON_BUILD_OBJECT(
@@ -411,7 +473,6 @@ export const getUniversidadById = async (req, res) => {
           WHERE s.iduniversidad = u.iduniversidad
           AND ca.estadoprograma = 'Activo'
         ) AS carreras_detalle,
-        -- Sedes
         (
           SELECT JSON_AGG(
             JSON_BUILD_OBJECT(
@@ -427,6 +488,7 @@ export const getUniversidadById = async (req, res) => {
       JOIN ciudad c ON c.codigomunicipio = u.codigomunicipio
       JOIN departamento d ON d.codigodepartamento = c.codigodepartamento
       JOIN tipo_universidad tu ON tu.id_tipo = u.id_tipo
+      LEFT JOIN ranking r ON r.iduniversidad = u.iduniversidad
       WHERE u.iduniversidad = $1
     `;
 
