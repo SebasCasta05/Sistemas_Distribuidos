@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../componentesCss/hilos.css";
 import Header from "./Header.jsx";
 import Footer from "./Footer.jsx";
@@ -10,6 +11,7 @@ const Hilos = () => {
   const [respuestas, setRespuestas] = useState({});
   const [cargando, setCargando] = useState(false);
   const [cargandoRespuestas, setCargandoRespuestas] = useState({});
+  const navigate = useNavigate();
 
   // 🔹 Cargar usuario desde sessionStorage
   useEffect(() => {
@@ -124,6 +126,11 @@ const Hilos = () => {
     }
   };
 
+  // 🔹 Navegar al perfil del usuario
+  const verPerfilUsuario = (idUsuario) => {
+    navigate(`/perfil/${idUsuario}`);
+  };
+
   return (
     <>
       <Header />
@@ -158,7 +165,13 @@ const Hilos = () => {
             hilos.map((hilo) => (
               <div key={hilo.id_hilo} className="hilo-card">
                 <div className="hilo-header">
-                  <strong>{hilo.nombre_usuario}</strong>{" "}
+                  <strong 
+                    className="usuario-link"
+                    onClick={() => verPerfilUsuario(hilo.id_usuario)}
+                    title="Ver perfil"
+                  >
+                    {hilo.nombre_usuario}
+                  </strong>{" "}
                   <span className="fecha">
                     {new Date(hilo.fecha_creacion).toLocaleString()}
                   </span>
@@ -172,7 +185,13 @@ const Hilos = () => {
                     hilo.respuestas.map((r) => (
                       <div key={r.id_respuesta} className="respuesta">
                         <div className="respuesta-header">
-                          <strong>{r.nombre_usuario}</strong>{" "}
+                          <strong 
+                            className="usuario-link"
+                            onClick={() => verPerfilUsuario(r.id_usuario)}
+                            title="Ver perfil"
+                          >
+                            {r.nombre_usuario}
+                          </strong>{" "}
                           <span className="fecha">
                             {new Date(r.fecha_creacion).toLocaleString()}
                           </span>

@@ -190,3 +190,160 @@ export const updateUserImage = async (req, res) => {
     res.status(500).json({ message: "Error en el servidor" });
   }
 };
+export const seguirUsuario = async (req, res) => {
+  try {
+    const { id_seguidor, id_seguido } = req.body;
+
+    if (!id_seguidor || !id_seguido) {
+      return res.status(400).json({ message: "IDs de seguidor y seguido son requeridos" });
+    }
+
+    if (id_seguidor === id_seguido) {
+      return res.status(400).json({ message: "No puedes seguirte a ti mismo" });
+    }
+
+    // Verificar si ya sigue al usuario
+    const yaSigue = await pool.query(
+      "SELECT * FROM seguidores WHERE id_seguidor = $1 AND id_seguido = $2",
+      [id_seguidor, id_seguido]
+    );
+
+    if (yaSigue.rows.length > 0) {
+      return res.status(400).json({ message: "Ya sigues a este usuario" });
+    }
+
+    // Crear el seguimiento
+    await pool.query(
+      "INSERT INTO seguidores (id_seguidor, id_seguido) VALUES ($1, $2)",
+      [id_seguidor, id_seguido]
+    );
+
+    res.status(201).json({ 
+      message: "Usuario seguido correctamente",
+      siguiendo: true 
+    });
+
+  } catch (err) {
+    console.error("❌ Error en seguirUsuario:", err);
+    res.status(500).json({ message: "Error en el servidor" });
+  }
+};
+
+// Dejar de seguir a un usuario
+export const dejarSeguirUsuario = async (req, res) => {
+  try {
+    const { id_seguidor, id_seguido } = req.body;
+
+    if (!id_seguidor || !id_seguido) {
+      return res.status(400).json({ message: "IDs de seguidor y seguido son requeridos" });
+    }
+
+    const result = await pool.query(
+      "DELETE FROM seguidores WHERE id_seguidor = $1 AND id_seguido = $2 RETURNING *",
+      [id_seguidor, id_seguido]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "No sigues a este usuario" });
+    }
+
+    res.json({ 
+      message: "Has dejado de seguir al usuario",
+      siguiendo: false 
+    });
+
+  } catch (err) {
+    console.error("❌ Error en dejarSeguirUsuario:", err);
+    res.status(500).json({ message: "Error en el servidor" });
+  }
+};
+
+// Verificar si un usuario sigue a otro
+export const verificarSeguimiento = async (req, res) => {
+  try {
+    const { id_seguidor, id_seguido } = req.params;
+
+    const result = await pool.query(
+      "SELECT * FROM seguidores WHERE id_seguidor = $1 AND id_seguido = $2",
+      [id_seguidor, id_seguido]
+    );
+
+    res.json({ 
+      siguiendo: result.rows.length > 0 
+    });
+
+  } catch (err) {
+    console.error("❌ Error en verificarSeguimiento:", err);
+    res.status(500).json({ message: "Error en el servidor" });
+  }
+};
+
+// Obtener seguidores de un usuario
+export const obtenerSeguidores = async (req, res) => {
+  try {
+    const { id_usuario } = req.params;
+
+    const result = await pool.query(
+      `SELECT u.id_usuario, u.nombre, u.apellido, u.imagen_url, s.fecha
+       FROM seguidores s
+       JOIN usuario u ON u.id_usuario = s.id_seguidor
+       WHERE s.id_seguido = $1
+       ORDER BY s.fecha DESC`,
+      [id_usuario]
+    );
+
+    res.json(result.rows);
+
+  } catch (err) {
+    console.error("❌ Error en obtenerSeguidores:", err);
+    res.status(500).json({ message: "Error en el servidor" });
+  }
+};
+
+// Obtener usuarios que sigue un usuario
+export const obtenerSeguidos = async (req, res) => {
+  try {
+    const { id_usuario } = req.params;
+
+    const result = await pool.query(
+      `SELECT u.id_usuario, u.nombre, u.apellido, u.imagen_url, s.fecha
+       FROM seguidores s
+       JOIN usuario u ON u.id_usuario = s.id_seguido
+       WHERE s.id_seguidor = $1
+       ORDER BY s.fecha DESC`,
+      [id_usuario]
+    );
+
+    res.json(result.rows);
+
+  } catch (err) {
+    console.error("❌ Error en obtenerSeguidos:", err);
+    res.status(500).json({ message: "Error en el servidor" });
+  }
+};
+
+// Obtener contadores de seguidores y seguidos
+export const obtenerEstadisticasSeguidores = async (req, res) => {
+  try {
+    const { id_usuario } = req.params;
+
+    const seguidoresCount = await pool.query(
+      "SELECT COUNT(*) FROM seguidores WHERE id_seguido = $1",
+      [id_usuario]
+    );
+
+    const seguidosCount = await pool.query(
+      "SELECT COUNT(*) FROM seguidores WHERE id_seguidor = $1",
+      [id_usuario]
+    );
+
+    res.json({
+      seguidores: parseInt(seguidoresCount.rows[0].count),
+      seguidos: parseInt(seguidosCount.rows[0].count)
+    });
+
+  } catch (err) {
+    console.error("❌ Error en obtenerEstadisticasSeguidores:", err);
+    res.status(500).json({ message: "Error en el servidor" });
+  }
+};

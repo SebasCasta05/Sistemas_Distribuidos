@@ -5,6 +5,7 @@ import Register from "./interfaces/Register.jsx";
 import Perfil from "./interfaces/Perfil.jsx";
 import Muro from "./interfaces/muro.jsx";
 import Hilos from "./interfaces/Hilos.jsx";
+import PerfilPublico from "./interfaces/PerfilPublico.jsx";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/perfil" element={<Perfil />} />
+        <Route path="/perfil/:id" element={<PerfilPublico />} />
         <Route path="/muro" element={<Muro />} />
         <Route path="/hilos" element={<Hilos />} />
       </Routes>

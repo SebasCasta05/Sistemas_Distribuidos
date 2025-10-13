@@ -7,7 +7,6 @@ import Footer from './Footer.jsx';
 import "../componentesCss/Perfil.css";
 import Favoritas from "./Favoritas.jsx";
 
-
 function Perfil() {
   const [isEditing, setIsEditing] = useState(false);
   const [profileImage, setProfileImage] = useState('/api/placeholder/140/140');
@@ -19,6 +18,7 @@ function Perfil() {
   const [errorMsg, setErrorMsg] = useState('');
   const [publicaciones, setPublicaciones] = useState([]);
   const [deletingIds, setDeletingIds] = useState(new Set());
+  const [estadisticas, setEstadisticas] = useState({ seguidores: 0, seguidos: 0 });
 
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showCoverModal, setShowCoverModal] = useState(false);
@@ -33,6 +33,19 @@ function Perfil() {
     localStorage.removeItem('user');
     localStorage.removeItem('usuario');
     window.location.href = '/login';
+  };
+
+  // 🔹 Cargar estadísticas de seguidores
+  const cargarEstadisticasSeguidores = async (userId) => {
+    try {
+      const statsRes = await fetch(`http://localhost:5000/api/users/${userId}/estadisticas-seguidores`);
+      if (statsRes.ok) {
+        const statsData = await statsRes.json();
+        setEstadisticas(statsData);
+      }
+    } catch (err) {
+      console.error('Error cargando estadísticas de seguidores:', err);
+    }
   };
 
   useEffect(() => {
@@ -83,6 +96,9 @@ function Perfil() {
         if (normalizedUser.cover_image) {
           setCoverImage(normalizedUser.cover_image);
         }
+
+        // Cargar estadísticas de seguidores
+        await cargarEstadisticasSeguidores(id);
       } catch (err) {
         console.error('Error al obtener usuario:', err);
         setErrorMsg(prev => prev || (err.message || 'Error cargando perfil'));
@@ -280,50 +296,50 @@ function Perfil() {
     return true;
   };
 
-const handleSaveProfileImage = async () => {
-  if (!validateImageUrl(tempImageUrl)) return;
+  const handleSaveProfileImage = async () => {
+    if (!validateImageUrl(tempImageUrl)) return;
 
-  if (!userInfo || !userInfo.id_usuario) {
-    setImageError('No se pudo identificar al usuario');
-    return;
-  }
-
-  setImageError('');
-  
-  try {
-    const response = await fetch(`http://localhost:5000/api/users/${userInfo.id_usuario}/imagen`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ imagen_url: tempImageUrl }),
-    });
-//ss
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Error al guardar la imagen.");
+    if (!userInfo || !userInfo.id_usuario) {
+      setImageError('No se pudo identificar al usuario');
+      return;
     }
 
-    const nuevaImagen = data.imagen_url || tempImageUrl;
-    setProfileImage(nuevaImagen);
-
-    const updatedUser = { ...userInfo, imagen_url: nuevaImagen, profile_image: nuevaImagen };
-    setUserInfo(updatedUser);
-
+    setImageError('');
+    
     try {
-      sessionStorage.setItem('user', JSON.stringify(updatedUser));
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-    } catch (e) {
-      console.warn('No se pudo actualizar sessionStorage/localStorage:', e);
-    }
+      const response = await fetch(`http://localhost:5000/api/users/${userInfo.id_usuario}/imagen`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imagen_url: tempImageUrl }),
+      });
 
-    setStatusMsg('Imagen de perfil actualizada ✅');
-    setTimeout(() => setStatusMsg(''), 3000);
-    handleCloseModals();
-  } catch (error) {
-    console.error("Error:", error);
-    setImageError("No se pudo conectar con el servidor.");
-  }
-};
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Error al guardar la imagen.");
+      }
+
+      const nuevaImagen = data.imagen_url || tempImageUrl;
+      setProfileImage(nuevaImagen);
+
+      const updatedUser = { ...userInfo, imagen_url: nuevaImagen, profile_image: nuevaImagen };
+      setUserInfo(updatedUser);
+
+      try {
+        sessionStorage.setItem('user', JSON.stringify(updatedUser));
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      } catch (e) {
+        console.warn('No se pudo actualizar sessionStorage/localStorage:', e);
+      }
+
+      setStatusMsg('Imagen de perfil actualizada ✅');
+      setTimeout(() => setStatusMsg(''), 3000);
+      handleCloseModals();
+    } catch (error) {
+      console.error("Error:", error);
+      setImageError("No se pudo conectar con el servidor.");
+    }
+  };
 
   const handleSaveCoverImage = async () => {
     if (!validateImageUrl(tempImageUrl)) return;
@@ -393,8 +409,6 @@ const handleSaveProfileImage = async () => {
       <Header />
       <main className="main-content">
         <div className="perfil-container">
-
-
           <div className="perfil-header">
             <div className="avatar-container">
               <div className="perfil-avatar">
@@ -472,9 +486,18 @@ const handleSaveProfileImage = async () => {
               <div className="stats-card">
                 <h3 className="card-title"><Award size={20} /> Estadísticas</h3>
                 <div className="stats-grid">
-                  <div className="stat-item"><span className="stat-number">{publicaciones.length}</span><span className="stat-label">Publicaciones</span></div>
-                  <div className="stat-item"><span className="stat-number">48</span><span className="stat-label">Seguidores</span></div>
-                  <div className="stat-item"><span className="stat-number">23</span><span className="stat-label">Siguiendo</span></div>
+                  <div className="stat-item">
+                    <span className="stat-number">{publicaciones.length}</span>
+                    <span className="stat-label">Publicaciones</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-number">{estadisticas.seguidores}</span>
+                    <span className="stat-label">Seguidores</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-number">{estadisticas.seguidos}</span>
+                    <span className="stat-label">Siguiendo</span>
+                  </div>
                 </div>
               </div>
             </aside>
@@ -525,8 +548,8 @@ const handleSaveProfileImage = async () => {
           </div>
         </div>
         <div className="favoritas-container">
-  <Favoritas idUsuario={userInfo?.id_usuario} />
-</div>
+          <Favoritas idUsuario={userInfo?.id_usuario} />
+        </div>
 
         <div style={{ padding: 12 }}>
           {statusMsg && <div style={{ color: 'green' }}>{statusMsg}</div>}
@@ -653,7 +676,6 @@ const handleSaveProfileImage = async () => {
       )}
     </div>
   );
-
 }
 
 export default Perfil;
