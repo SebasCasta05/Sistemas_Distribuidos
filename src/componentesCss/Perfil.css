@@ -1308,3 +1308,77 @@ html {
   transform: none;
   box-shadow: none;
 }
+/* Estilos para pestañas de contenido */
+.content-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #e1e5e9;
+  padding-bottom: 0;
+}
+
+.tab-btn {
+  padding: 12px 24px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #6b7280;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tab-btn:hover {
+  color: #374151;
+  background-color: #f9fafb;
+}
+
+.tab-btn.active {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+  background-color: #f0f7ff;
+}
+
+/* Estilos para hilos */
+.hilo-card {
+  border-left: 4px solid #3b82f6;
+}
+
+.hilo-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.hilo-badge {
+  background: #3b82f6;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.hilo-contenido {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #374151;
+  margin-bottom: 12px;
+}
+
+.hilo-imagen {
+  margin: 12px 0;
+}
+
+.respuestas-count {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+/* Estadística actualizada */
+.stat-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+}

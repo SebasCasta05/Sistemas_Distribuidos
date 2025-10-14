@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  User, Mail, GraduationCap, Calendar, Edit3, Camera, Award, Trash2, Link as LinkIcon, Eye
+  User, Mail, GraduationCap, Calendar, Edit3, Camera, Award, Trash2, Link as LinkIcon, Eye, MessageCircle
 } from 'lucide-react';
 import Header from './Header.jsx';
 import Footer from './Footer.jsx';
@@ -17,6 +17,7 @@ function Perfil() {
   const [statusMsg, setStatusMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [publicaciones, setPublicaciones] = useState([]);
+  const [hilos, setHilos] = useState([]);
   const [deletingIds, setDeletingIds] = useState(new Set());
   const [estadisticas, setEstadisticas] = useState({ seguidores: 0, seguidos: 0 });
 
@@ -48,8 +49,57 @@ function Perfil() {
     }
   };
 
+  // 🔹 Cargar hilos del usuario
+  const cargarHilosUsuario = async (userId) => {
+    try {
+      const hilosRes = await fetch(`http://localhost:5000/api/hilos/usuario/${userId}`);
+      if (hilosRes.ok) {
+        const hilosData = await hilosRes.json();
+        setHilos(hilosData);
+      }
+    } catch (err) {
+      console.error('Error cargando hilos del usuario:', err);
+    }
+  };
+
+  // 🔹 Eliminar hilo
+  const handleDeleteHilo = async (id_hilo) => {
+    const confirmacion = window.confirm('¿Estás seguro de eliminar este hilo?');
+    if (!confirmacion) return;
+
+    setDeletingIds(prev => new Set(prev).add(`hilo-${id_hilo}`));
+    setErrorMsg('');
+    setStatusMsg('');
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/hilos/${id_hilo}`, {
+        method: 'DELETE',
+      });
+
+      const resBody = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        const message = resBody.message || resBody.error || 'Error al eliminar hilo';
+        throw new Error(message);
+      }
+
+      setHilos(prev => prev.filter(h => h.id_hilo !== id_hilo));
+      setStatusMsg('Hilo eliminado correctamente ✅');
+      setTimeout(() => setStatusMsg(''), 3500);
+    } catch (err) {
+      console.error('Error eliminando hilo:', err);
+      setErrorMsg(err.message || 'No se pudo eliminar el hilo');
+    } finally {
+      setDeletingIds(prev => {
+        const next = new Set(prev);
+        next.delete(`hilo-${id_hilo}`);
+        return next;
+      });
+    }
+  };
+
   useEffect(() => {
-    const loadProfileAndPublicaciones = async () => {
+    const loadProfileAndContent = async () => {
       setLoading(true);
       setErrorMsg('');
       setStatusMsg('');
@@ -105,6 +155,7 @@ function Perfil() {
       }
 
       try {
+        // Cargar publicaciones del usuario
         const pubsRes = await fetch(`http://localhost:5000/api/publicaciones/usuario/${id}`);
         if (!pubsRes.ok) {
           const errBody = await pubsRes.json().catch(() => ({}));
@@ -145,15 +196,19 @@ function Perfil() {
         });
 
         setPublicaciones(normalized);
+
+        // Cargar hilos del usuario
+        await cargarHilosUsuario(id);
+
       } catch (err) {
-        console.error('Error cargando publicaciones:', err);
+        console.error('Error cargando contenido:', err);
         setErrorMsg(prev => prev || (err.message || 'No se pudieron cargar las publicaciones'));
       } finally {
         setLoading(false);
       }
     };
 
-    loadProfileAndPublicaciones();
+    loadProfileAndContent();
   }, []);
 
   const handleInputChange = (field, value) => {
@@ -205,6 +260,13 @@ function Perfil() {
     const date = new Date(dateStr);
     if (isNaN(date.getTime())) return '—';
     return date.toLocaleDateString();
+  };
+
+  const formatDateTime = (dateStr) => {
+    if (!dateStr) return '—';
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return '—';
+    return date.toLocaleString();
   };
 
   const handleDeletePublicacion = async (id_publicacion) => {
@@ -487,7 +549,7 @@ function Perfil() {
                 <h3 className="card-title"><Award size={20} /> Estadísticas</h3>
                 <div className="stats-grid">
                   <div className="stat-item">
-                    <span className="stat-number">{publicaciones.length}</span>
+                    <span className="stat-number">{publicaciones.length + hilos.length}</span>
                     <span className="stat-label">Publicaciones</span>
                   </div>
                   <div className="stat-item">
@@ -505,44 +567,108 @@ function Perfil() {
             <main className="perfil-main">
               <div className="posts-section">
                 <div className="content-tabs">
-                  <button className={`tab-btn ${activeTab === 'publicaciones' ? 'active' : ''}`} onClick={() => handleTabChange('publicaciones')}>
+                  <button 
+                    className={`tab-btn ${activeTab === 'publicaciones' ? 'active' : ''}`} 
+                    onClick={() => handleTabChange('publicaciones')}
+                  >
                     Publicaciones
+                  </button>
+                  <button 
+                    className={`tab-btn ${activeTab === 'hilos' ? 'active' : ''}`} 
+                    onClick={() => handleTabChange('hilos')}
+                  >
+                    Hilos
                   </button>
                 </div>
 
-                <div className="posts-container">
-                  {publicaciones.length > 0 ? (
-                    publicaciones.map((pub) => (
-                      <div key={pub.id_publicacion} className="post-card">
-                        <h3>{pub.titulo}</h3>
-                        <p>{pub.descripcion}</p>
-                        <small>
-                          {pub.tipo_publicacion === 'vivienda'
-                            ? `🏠 Ciudad: ${pub.detalle_1} | Precio: $${pub.detalle_2}`
-                            : `💼 Empresa: ${pub.detalle_1} | Salario: $${pub.detalle_2}`}
-                        </small>
-                        <div className="post-footer">Publicado el {formatDate(pub.created_at)}</div>
+                {/* Contenido de Publicaciones */}
+                {activeTab === 'publicaciones' && (
+                  <div className="posts-container">
+                    {publicaciones.length > 0 ? (
+                      publicaciones.map((pub) => (
+                        <div key={pub.id_publicacion} className="post-card">
+                          <h3>{pub.titulo}</h3>
+                          <p>{pub.descripcion}</p>
+                          <small>
+                            {pub.tipo_publicacion === 'vivienda'
+                              ? `🏠 Ciudad: ${pub.detalle_1} | Precio: $${pub.detalle_2}`
+                              : `💼 Empresa: ${pub.detalle_1} | Salario: $${pub.detalle_2}`}
+                          </small>
+                          <div className="post-footer">Publicado el {formatDate(pub.created_at)}</div>
 
-                        <div style={{ marginTop: 8 }}>
-                          <button
-                            className="btn-delete"
-                            onClick={() => handleDeletePublicacion(pub.id_publicacion)}
-                            disabled={deletingIds.has(pub.id_publicacion)}
-                            title={deletingIds.has(pub.id_publicacion) ? 'Eliminando...' : 'Eliminar publicación'}
-                          >
-                            <Trash2 size={14} /> {deletingIds.has(pub.id_publicacion) ? 'Eliminando...' : 'Eliminar'}
-                          </button>
+                          <div style={{ marginTop: 8 }}>
+                            <button
+                              className="btn-delete"
+                              onClick={() => handleDeletePublicacion(pub.id_publicacion)}
+                              disabled={deletingIds.has(pub.id_publicacion)}
+                              title={deletingIds.has(pub.id_publicacion) ? 'Eliminando...' : 'Eliminar publicación'}
+                            >
+                              <Trash2 size={14} /> {deletingIds.has(pub.id_publicacion) ? 'Eliminando...' : 'Eliminar'}
+                            </button>
+                          </div>
                         </div>
+                      ))
+                    ) : (
+                      <div className="empty-state">
+                        <div className="empty-icon">📝</div>
+                        <h3>¡Comienza a compartir!</h3>
+                        <p>Aún no tienes publicaciones. Comparte tus ideas, proyectos y experiencias con la comunidad.</p>
                       </div>
-                    ))
-                  ) : (
-                    <div className="empty-state">
-                      <div className="empty-icon">📝</div>
-                      <h3>¡Comienza a compartir!</h3>
-                      <p>Aún no tienes publicaciones. Comparte tus ideas, proyectos y experiencias con la comunidad.</p>
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Contenido de Hilos */}
+                {activeTab === 'hilos' && (
+                  <div className="posts-container">
+                    {hilos.length > 0 ? (
+                      hilos.map((hilo) => (
+                        <div key={hilo.id_hilo} className="post-card hilo-card">
+                          <div className="hilo-header">
+                            <MessageCircle size={16} />
+                            <span className="hilo-badge">Hilo</span>
+                          </div>
+                          <p className="hilo-contenido">{hilo.contenido}</p>
+                          {hilo.imagen_url && (
+                            <div className="hilo-imagen">
+                              <img 
+                                src={hilo.imagen_url} 
+                                alt="Imagen del hilo" 
+                                onClick={() => handleViewImage(hilo.imagen_url, false)}
+                                style={{ cursor: 'pointer', maxWidth: '200px', borderRadius: '8px' }}
+                              />
+                            </div>
+                          )}
+                          <div className="post-footer">
+                            Publicado el {formatDateTime(hilo.fecha_creacion)}
+                            {hilo.respuestas && hilo.respuestas.length > 0 && (
+                              <span className="respuestas-count">
+                                • {hilo.respuestas.length} respuesta{hilo.respuestas.length !== 1 ? 's' : ''}
+                              </span>
+                            )}
+                          </div>
+
+                          <div style={{ marginTop: 8 }}>
+                            <button
+                              className="btn-delete"
+                              onClick={() => handleDeleteHilo(hilo.id_hilo)}
+                              disabled={deletingIds.has(`hilo-${hilo.id_hilo}`)}
+                              title={deletingIds.has(`hilo-${hilo.id_hilo}`) ? 'Eliminando...' : 'Eliminar hilo'}
+                            >
+                              <Trash2 size={14} /> {deletingIds.has(`hilo-${hilo.id_hilo}`) ? 'Eliminando...' : 'Eliminar'}
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="empty-state">
+                        <div className="empty-icon">💬</div>
+                        <h3>¡Comienza una conversación!</h3>
+                        <p>Aún no has creado hilos. Comparte tus pensamientos y preguntas con la comunidad.</p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </main>
           </div>
@@ -558,6 +684,7 @@ function Perfil() {
       </main>
       <Footer />
 
+      {/* Modales (mantener igual) */}
       {showProfileModal && (
         <div className="modal-overlay" onClick={handleCloseModals}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>

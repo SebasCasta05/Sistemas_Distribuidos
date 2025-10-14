@@ -166,3 +166,75 @@ export const crearRespuesta = async (req, res) => {
     });
   }
 };
+// En hilosController.js - agregar estas funciones
+
+// Obtener hilos de un usuario específico
+export const obtenerHilosUsuario = async (req, res) => {
+  try {
+    const { id_usuario } = req.params;
+
+    console.log("📋 Obteniendo hilos del usuario:", id_usuario);
+    
+    const result = await pool.query(`
+      SELECT h.*, u.nombre AS nombre_usuario
+      FROM hilos h
+      JOIN usuario u ON u.id_usuario = h.id_usuario
+      WHERE h.id_usuario = $1
+      ORDER BY h.fecha_creacion DESC
+    `, [id_usuario]);
+
+    const hilos = result.rows;
+    console.log(`✅ Se encontraron ${hilos.length} hilos para el usuario ${id_usuario}`);
+
+    // Obtener respuestas asociadas a cada hilo
+    for (const hilo of hilos) {
+      const respuestas = await pool.query(
+        `SELECT r.*, u.nombre AS nombre_usuario
+         FROM respuestas_hilo r
+         JOIN usuario u ON u.id_usuario = r.id_usuario
+         WHERE r.id_hilo = $1
+         ORDER BY r.fecha_creacion ASC`,
+        [hilo.id_hilo]
+      );
+      hilo.respuestas = respuestas.rows;
+    }
+
+    res.json(hilos);
+  } catch (error) {
+    console.error("❌ Error obteniendo hilos del usuario:", error);
+    res.status(500).json({ 
+      error: "Error obteniendo hilos del usuario",
+      detalles: error.message 
+    });
+  }
+};
+
+// Eliminar hilo
+export const eliminarHilo = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    console.log("🗑️ Eliminando hilo ID:", id);
+
+    // Primero eliminar las respuestas asociadas
+    await pool.query("DELETE FROM respuestas_hilo WHERE id_hilo = $1", [id]);
+
+    // Luego eliminar el hilo
+    const result = await pool.query("DELETE FROM hilos WHERE id_hilo = $1 RETURNING *", [id]);
+
+    if (result.rowCount === 0) {
+      console.log("❌ Hilo no encontrado:", id);
+      return res.status(404).json({ error: "Hilo no encontrado" });
+    }
+
+    console.log("✅ Hilo eliminado:", id);
+    res.json({ message: "Hilo eliminado correctamente" });
+
+  } catch (error) {
+    console.error("❌ Error eliminando hilo:", error);
+    res.status(500).json({ 
+      error: "Error eliminando hilo",
+      detalles: error.message 
+    });
+  }
+};
